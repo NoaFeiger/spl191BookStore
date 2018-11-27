@@ -1,6 +1,6 @@
 package bgu.spl.mics.application.passiveObjects;
 
-import java.util.HashMap;
+import java.io.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -86,6 +86,23 @@ public class Inventory {
      * This method is called by the main method in order to generate the output.
      */
 	public void printInventoryToFile(String filename){
-		//TODO: Implement this
+		for(ConcurrentHashMap.Entry<String, BookInventoryInfo> entry : books.entrySet()) {
+			String key = entry.getKey();
+			BookInventoryInfo value = entry.getValue();
+			print.put(key, value.getAmountInInventory());
+		}
+		try
+		{
+			FileOutputStream fos =
+					new FileOutputStream(filename);
+			ObjectOutputStream oos = new ObjectOutputStream(fos);
+			oos.writeObject(print);
+			oos.close();
+			fos.close();
+			System.out.printf("Serialized HashMap data is saved in " + filename);
+		}catch(IOException ioe)
+		{
+			ioe.printStackTrace();
+		}
 	}
 }

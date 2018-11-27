@@ -22,6 +22,7 @@ public abstract class MicroService implements Runnable {
 
     private boolean terminated = false;
     private final String name;
+    private HashMap<Object.Class, Callback> callbackHashMap;
 
     /**
      * @param name the micro-service name (used mainly for debugging purposes -
@@ -53,7 +54,6 @@ public abstract class MicroService implements Runnable {
      *                 queue.
      */
     protected final <T, E extends Event<T>> void subscribeEvent(Class<E> type, Callback<E> callback) {
-        //TODO: implement this.
     }
 
     /**
