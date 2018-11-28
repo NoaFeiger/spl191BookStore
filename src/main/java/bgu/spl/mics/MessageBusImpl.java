@@ -70,6 +70,7 @@ public class MessageBusImpl implements MessageBus {
 			serviceQueueHashMap.get(m).add(b);
 			m.notify();
 		}
+
 	}
 
 	
@@ -85,10 +86,10 @@ public class MessageBusImpl implements MessageBus {
 			robin.add(m);
 		}
 		serviceQueueHashMap.get(m).add(e);
-		synchronized (m)
-		{
-			m.notifyAll();
-		}
+//		synchronized (m)
+//		{
+//			m.notifyAll();
+//		}
 		return f;
 	}
 
