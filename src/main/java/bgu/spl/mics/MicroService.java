@@ -20,15 +20,20 @@ package bgu.spl.mics;
  */
 public abstract class MicroService implements Runnable {
 
-    private boolean terminated = false;
+    private boolean terminated;
     private final String name;
-
+    private MessageBus mb;
+    private ConcurrentHashMap<Event,Callback> collback_type;
     /**
      * @param name the micro-service name (used mainly for debugging purposes -
      *             does not have to be unique)
      */
     public MicroService(String name) {
         this.name = name;
+        this.terminated=false;
+       // this.mb=MessageBusImpl.getInstance();
+        collback_type=new ConcurrentHashMap<>();
+
     }
 
     /**
@@ -53,7 +58,9 @@ public abstract class MicroService implements Runnable {
      *                 queue.
      */
     protected final <T, E extends Event<T>> void subscribeEvent(Class<E> type, Callback<E> callback) {
-        //TODO: implement this.
+
+        collback_type.put(type,callback);
+        mb.subscribeEvent(type,this);
     }
 
     /**
@@ -77,7 +84,7 @@ public abstract class MicroService implements Runnable {
      *                 queue.
      */
     protected final <B extends Broadcast> void subscribeBroadcast(Class<B> type, Callback<B> callback) {
-        //TODO: implement this.
+
     }
 
     /**
@@ -118,13 +125,13 @@ public abstract class MicroService implements Runnable {
      *               {@code e}.
      */
     protected final <T> void complete(Event<T> e, T result) {
-        //TODO: implement this.
+        mb.complete(e,result);
     }
 
     /**
      * this method is called once when the event loop starts.
      */
-    protected abstract void initialize();
+    protected abstract void initialize(); //each micro service override this method
 
     /**
      * Signals the event loop that it must terminate after handling the current
@@ -148,9 +155,17 @@ public abstract class MicroService implements Runnable {
      */
     @Override
     public final void run() {
+        mb.register(this);
         initialize();
         while (!terminated) {
-            System.out.println("NOT IMPLEMENTED!!!"); //TODO: you should delete this line :)
+           try {
+               Message message=mb.awaitMessage(this);
+               Callback c=collback_type.get(message);
+               c.call(message);
+           }
+           catch (InterruptedException e){
+               System.out.print(e.getMessage());
+           }
         }
     }
 
