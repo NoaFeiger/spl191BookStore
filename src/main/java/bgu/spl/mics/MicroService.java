@@ -24,8 +24,7 @@ public abstract class MicroService implements Runnable {
     private boolean terminated;
     private final String name;
     private MessageBus mb;
-    private ConcurrentHashMap<Class<? extends Message>,Callback> collback_event;
-    private ConcurrentHashMap<Class<? extends Message>,Callback> colls_broadcast;
+    private ConcurrentHashMap<Class<? extends Message>,Callback> callbacks;
 
     /**
      * @param name the micro-service name (used mainly for debugging purposes -
@@ -35,8 +34,8 @@ public abstract class MicroService implements Runnable {
         this.name = name;
         this.terminated=false;
         this.mb=MessageBusImpl.getInstance();
-        collback_event =new ConcurrentHashMap<>();
-        colls_broadcast =new ConcurrentHashMap<>();
+        callbacks =new ConcurrentHashMap<>();
+        System.out.println("micro service "+this.name);
     }
 
     /**
@@ -61,7 +60,7 @@ public abstract class MicroService implements Runnable {
      *                 queue.
      */
     protected final <T, E extends Event<T>> void subscribeEvent(Class<E> type, Callback<E> callback) {
-        collback_event.put(type,callback);
+        callbacks.put(type,callback);
         mb.subscribeEvent(type,this);
     }
 
@@ -86,7 +85,7 @@ public abstract class MicroService implements Runnable {
      *                 queue.
      */
     protected final <B extends Broadcast> void subscribeBroadcast(Class<B> type, Callback<B> callback) {
-        colls_broadcast.put(type,callback);
+        callbacks.put(type,callback);
         mb.subscribeBroadcast(type,this);
     }
 
@@ -162,7 +161,7 @@ public abstract class MicroService implements Runnable {
         while (!terminated) {
            try {
                Message message=mb.awaitMessage(this);
-               Callback c= collback_event.get(message);
+               Callback c= callbacks.get(message);
                c.call(message);
            }
            catch (InterruptedException e){

@@ -16,15 +16,15 @@ public class MessageBusImpl implements MessageBus {
 	private ConcurrentHashMap<Class<? extends Event>, BlockingQueue<MicroService>> eventQueueHashMap_robin;
 	private ConcurrentHashMap<Class<? extends Broadcast>, LinkedList<MicroService>> broadcastListHashMap;
 	private ConcurrentHashMap<Event<?>, Future> eventFutureHashMap;
-//	private Queue<MicroService> CheckAvailablityEventQueue;
-//	private Queue<MicroService> OrderBookEventQueue;
+
 	private MessageBusImpl() {
 		serviceQueueHashMap = new ConcurrentHashMap<>();
 		eventFutureHashMap = new ConcurrentHashMap<>();
 		eventQueueHashMap_robin = new ConcurrentHashMap<>();
 		broadcastListHashMap = new ConcurrentHashMap<>();
-//		CheckAvailablityEventQueue = new LinkedList<>();
-//		OrderBookEventQueue = new LinkedList<>();
+		System.out.println("messagebus ");
+
+
 	}
 
 	public static MessageBusImpl getInstance() {
@@ -67,9 +67,9 @@ public class MessageBusImpl implements MessageBus {
 	@Override
 	public void sendBroadcast(Broadcast b) {
 		for ( MicroService m : broadcastListHashMap.get(b.getClass())){
-			synchronized(m) {
+			synchronized(m) {  // TODO CHECK IF SYNCHRONIZED IS NEEDED
 				serviceQueueHashMap.get(m).add(b);
-				m.notifyAll();
+			//	m.notifyAll();
 			}
 		}
 
