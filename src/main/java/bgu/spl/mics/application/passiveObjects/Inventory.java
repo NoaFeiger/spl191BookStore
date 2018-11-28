@@ -30,7 +30,11 @@ public class Inventory {
 
 	public static Inventory getInstance() {
 		if(instance == null) {
-			instance = new Inventory();
+			synchronized (Inventory.class) {
+				if(instance == null) {
+					instance = new Inventory();
+				}
+			}
 		}
 		return instance;
 	}
