@@ -51,10 +51,7 @@ public class Future<T> {
      * @return true if this object has been resolved, false otherwise
      */
 	public boolean isDone() {
-		if(result==null)
-			return false;
-		else
-			return true;
+		return result != null;
 	}
 	
 	/**
@@ -90,11 +87,12 @@ public class Future<T> {
 		else if (unit.equals(TimeUnit.SECONDS)) {
 			system = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
 		}
+		long timeoutExpiredMs = system + timeout;
 		while (!isDone()) {
-			long waitMs = timeout - system;
+			long waitMs = timeoutExpiredMs - system;
 			if (waitMs <= 0) {
 				// timeout expired
-				break;
+				return null;
 			}
 			try {
 				this.wait(timeout);

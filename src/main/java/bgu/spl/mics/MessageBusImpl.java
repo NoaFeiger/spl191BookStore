@@ -15,7 +15,7 @@ public class MessageBusImpl implements MessageBus {
 	private ConcurrentHashMap<MicroService, BlockingQueue<Message>> serviceQueueHashMap;
 	private ConcurrentHashMap<Class<? extends Event>, BlockingQueue<MicroService>> eventQueueHashMap_robin;
 	private ConcurrentHashMap<Class<? extends Broadcast>, LinkedList<MicroService>> broadcastListHashMap;
-	private ConcurrentHashMap<Event, Future> eventFutureHashMap;
+	private ConcurrentHashMap<Event<?>, Future> eventFutureHashMap;
 //	private Queue<MicroService> CheckAvailablityEventQueue;
 //	private Queue<MicroService> OrderBookEventQueue;
 	private MessageBusImpl() {
@@ -40,23 +40,20 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public <T> void subscribeEvent(Class<? extends Event<T>> type, MicroService m) {
-		if (!eventQueueHashMap_robin.containsKey(type)) {
-			eventQueueHashMap_robin.put(type, new LinkedBlockingQueue<>());
+		synchronized (type) {
+			if (!eventQueueHashMap_robin.containsKey(type)) {
+				eventQueueHashMap_robin.put(type, new LinkedBlockingQueue<>());
+			}
 		}
 		eventQueueHashMap_robin.get(type).add(m);
-//		if(CheckAvailabiltyEvent.class.isAssignableFrom(type)) {
-//			CheckAvailablityEventQueue.add(m);
-//		}
-//		else if (OrderBookEvent.class.isAssignableFrom(type)){
-//			OrderBookEventQueue.add(m);
-//		}
-
 	}
 
 	@Override
 	public void subscribeBroadcast(Class<? extends Broadcast> type, MicroService m) {
-		if (!broadcastListHashMap.containsKey(type)) {
-			broadcastListHashMap.put(type, new LinkedList<>());
+		synchronized (type) {
+			if (!broadcastListHashMap.containsKey(type)) {
+				broadcastListHashMap.put(type, new LinkedList<>());
+			}
 		}
 		broadcastListHashMap.get(type).add(m);
 	}
