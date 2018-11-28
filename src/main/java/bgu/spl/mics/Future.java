@@ -71,9 +71,11 @@ public class Future<T> {
      *         elapsed, return null.
      */
 	public T get(long timeout, TimeUnit unit) {
-		long timeoutExpiredMs = getSystem(unit, System.currentTimeMillis()) + timeout;
+	//	long timeoutExpiredMs = getSystem(unit, System.currentTimeMillis()) + timeout;
+		long timeoutExpiredMs = System.currentTimeMillis() + timeout;
 		while (!isDone()) {
-			long waitMs = timeoutExpiredMs - getSystem(unit, System.currentTimeMillis());
+	//		long waitMs = timeoutExpiredMs - getSystem(unit, System.currentTimeMillis());
+			long waitMs = timeoutExpiredMs -System.currentTimeMillis();
 			if (waitMs <= 0) {
 				// timeout expired
 				return null;

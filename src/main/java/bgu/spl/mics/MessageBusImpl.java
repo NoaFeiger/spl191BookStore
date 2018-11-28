@@ -89,10 +89,10 @@ public class MessageBusImpl implements MessageBus {
 			robin.add(m);
 		}
 		serviceQueueHashMap.get(m).add(e);
-//		synchronized (m)
-//		{
-//			m.notifyAll();
-//		}
+		synchronized (m)
+		{
+			m.notifyAll();
+		}
 		return f;
 	}
 
