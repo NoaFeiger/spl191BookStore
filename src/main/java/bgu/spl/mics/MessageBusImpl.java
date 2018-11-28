@@ -2,7 +2,6 @@ package bgu.spl.mics;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.BlockingQueue;
-import java.util.LinkedList;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -14,17 +13,15 @@ public class MessageBusImpl implements MessageBus {
 	private static MessageBusImpl instance = null;
 	private ConcurrentHashMap<MicroService, BlockingQueue<Message>> serviceQueueHashMap;
 	private ConcurrentHashMap<Class<? extends Event>, BlockingQueue<MicroService>> eventQueueHashMap_robin;
-	private ConcurrentHashMap<Class<? extends Broadcast>, LinkedList<MicroService>> broadcastListHashMap;
+	private ConcurrentHashMap<Class<? extends Broadcast>, BlockingQueue<MicroService>> broadcastQueueHashMap;
 	private ConcurrentHashMap<Event<?>, Future> eventFutureHashMap;
 
 	private MessageBusImpl() {
 		serviceQueueHashMap = new ConcurrentHashMap<>();
 		eventFutureHashMap = new ConcurrentHashMap<>();
 		eventQueueHashMap_robin = new ConcurrentHashMap<>();
-		broadcastListHashMap = new ConcurrentHashMap<>();
+		broadcastQueueHashMap = new ConcurrentHashMap<>();
 		System.out.println("messagebus ");
-
-
 	}
 
 	public static MessageBusImpl getInstance() {
@@ -51,11 +48,11 @@ public class MessageBusImpl implements MessageBus {
 	@Override
 	public void subscribeBroadcast(Class<? extends Broadcast> type, MicroService m) {
 		synchronized (type) {
-			if (!broadcastListHashMap.containsKey(type)) {
-				broadcastListHashMap.put(type, new LinkedList<>());
+			if (!broadcastQueueHashMap.containsKey(type)) {
+				broadcastQueueHashMap.put(type, new LinkedBlockingQueue<>());
 			}
 		}
-		broadcastListHashMap.get(type).add(m);
+		broadcastQueueHashMap.get(type).add(m);
 	}
 
 	@Override
@@ -66,12 +63,16 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public void sendBroadcast(Broadcast b) {
-		for ( MicroService m : broadcastListHashMap.get(b.getClass())){
+		if (broadcastQueueHashMap.get(b.getClass())==null) {
+			return;
+		}
+		for ( MicroService m : broadcastQueueHashMap.get(b.getClass())){
 			synchronized(m) {  // TODO CHECK IF SYNCHRONIZED IS NEEDED
 				serviceQueueHashMap.get(m).add(b);
 			//	m.notifyAll();
 			}
 		}
+
 
 	}
 
@@ -108,9 +109,9 @@ public class MessageBusImpl implements MessageBus {
 				q.remove(m);
 			}
 		}
-		for ( LinkedList<MicroService> l : broadcastListHashMap.values()){
-			synchronized(l) {
-				l.remove(m);
+		for ( BlockingQueue<MicroService> q : broadcastQueueHashMap.values()){
+			synchronized(q) {
+				q.remove(m);
 			}
 		}
 		synchronized(serviceQueueHashMap.get(m)) {
@@ -125,12 +126,12 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public Message awaitMessage(MicroService m) throws InterruptedException {
-//		synchronized (m) {
-//			while(serviceQueueHashMap.get(m).isEmpty()) {
-//				m.wait();
-//			}
-		return serviceQueueHashMap.get(m).remove();
-//		}
+		synchronized (m) {
+			while(serviceQueueHashMap.get(m).isEmpty()) {
+				m.wait();
+			}
+			return serviceQueueHashMap.get(m).remove();
+		}
 	}
 
 	

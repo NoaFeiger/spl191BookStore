@@ -32,7 +32,9 @@ public class Future<T> {
 	public synchronized T get() {
 			while (!isDone()) {
 				try {
-					this.wait();
+					synchronized (this) {
+						this.wait();
+					}
 				}
 				catch (InterruptedException e){
 					System.out.println(e.getMessage());
@@ -77,7 +79,9 @@ public class Future<T> {
 				return null;
 			}
 			try {
-				this.wait(timeout);
+				synchronized (this) {
+					this.wait();
+				}
 			}
 			catch (InterruptedException e){
 				System.out.println(e.getMessage());
