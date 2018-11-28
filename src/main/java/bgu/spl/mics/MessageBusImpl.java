@@ -13,7 +13,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class MessageBusImpl implements MessageBus {
 	private static MessageBusImpl instance = null;
 	private ConcurrentHashMap<MicroService, BlockingQueue<Message>> serviceQueueHashMap;
-	private ConcurrentHashMap<Class<? extends Event>, BlockingQueue<MicroService>> eventQueueHashMap;
+	private ConcurrentHashMap<Class<? extends Event>, BlockingQueue<MicroService>> eventQueueHashMap_robin;
 	private ConcurrentHashMap<Class<? extends Broadcast>, LinkedList<MicroService>> broadcastListHashMap;
 	private ConcurrentHashMap<Event, Future> eventFutureHashMap;
 //	private Queue<MicroService> CheckAvailablityEventQueue;
@@ -21,7 +21,7 @@ public class MessageBusImpl implements MessageBus {
 	private MessageBusImpl() {
 		serviceQueueHashMap = new ConcurrentHashMap<>();
 		eventFutureHashMap = new ConcurrentHashMap<>();
-		eventQueueHashMap = new ConcurrentHashMap<>();
+		eventQueueHashMap_robin = new ConcurrentHashMap<>();
 		broadcastListHashMap = new ConcurrentHashMap<>();
 //		CheckAvailablityEventQueue = new LinkedList<>();
 //		OrderBookEventQueue = new LinkedList<>();
@@ -40,10 +40,10 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public <T> void subscribeEvent(Class<? extends Event<T>> type, MicroService m) {
-		if (!eventQueueHashMap.containsKey(type)) {
-			eventQueueHashMap.put(type, new LinkedBlockingQueue<>());
+		if (!eventQueueHashMap_robin.containsKey(type)) {
+			eventQueueHashMap_robin.put(type, new LinkedBlockingQueue<>());
 		}
-		eventQueueHashMap.get(type).add(m);
+		eventQueueHashMap_robin.get(type).add(m);
 //		if(CheckAvailabiltyEvent.class.isAssignableFrom(type)) {
 //			CheckAvailablityEventQueue.add(m);
 //		}
@@ -80,16 +80,16 @@ public class MessageBusImpl implements MessageBus {
 	public <T> Future<T> sendEvent(Event<T> e) {
 		Future<T> f = new Future<>();
 		eventFutureHashMap.put(e,f);
-		MicroService m = eventQueueHashMap.get(e.getClass()).remove();
+		MicroService m = eventQueueHashMap_robin.get(e.getClass()).remove();
 		serviceQueueHashMap.get(m).add(e);
-		eventQueueHashMap.get(e.getClass()).add(m);
-		m.notify();
+		eventQueueHashMap_robin.get(e.getClass()).add(m);
+		m.notifyAll();
 		return f;
 	}
 
 	@Override
 	public void register(MicroService m) {
-		serviceQueueHashMap.put(m, new LinkedList<>());
+		serviceQueueHashMap.put(m, new LinkedBlockingQueue<>());
 	}
 
 	@Override
