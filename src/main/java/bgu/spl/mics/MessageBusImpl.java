@@ -67,8 +67,10 @@ public class MessageBusImpl implements MessageBus {
 	@Override
 	public void sendBroadcast(Broadcast b) {
 		for ( MicroService m : broadcastListHashMap.get(b.getClass())){
-			serviceQueueHashMap.get(m).add(b);
-			m.notify();
+			synchronized(m) {
+				serviceQueueHashMap.get(m).add(b);
+				m.notifyAll();
+			}
 		}
 	}
 
@@ -99,15 +101,35 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public void unregister(MicroService m) {
+		m.terminate();
+		for ( BlockingQueue<MicroService> q : eventQueueHashMap_robin.values()){
+			synchronized(q) {
+				q.remove(m);
+			}
+		}
+		for ( LinkedList<MicroService> l : broadcastListHashMap.values()){
+			synchronized(l) {
+				l.remove(m);
+			}
+		}
+		synchronized(serviceQueueHashMap.get(m)) {
+			for (Message mes : serviceQueueHashMap.get(m)) {
+				if (mes instanceof Event) {
+					eventFutureHashMap.get(mes).resolve(null);
+				}
+			}
+		}
 		serviceQueueHashMap.remove(m);
 	}
 
 	@Override
 	public Message awaitMessage(MicroService m) throws InterruptedException {
-		while(serviceQueueHashMap.get(m).isEmpty()) {
-			m.wait();
-		}
+//		synchronized (m) {
+//			while(serviceQueueHashMap.get(m).isEmpty()) {
+//				m.wait();
+//			}
 		return serviceQueueHashMap.get(m).remove();
+//		}
 	}
 
 	

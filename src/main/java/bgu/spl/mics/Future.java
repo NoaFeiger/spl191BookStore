@@ -66,30 +66,9 @@ public class Future<T> {
      *         elapsed, return null.
      */
 	public T get(long timeout, TimeUnit unit) {
-		long system = 0;
-		if (unit.equals(TimeUnit.DAYS))
-			system = TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis());
-		else if (unit.equals(TimeUnit.HOURS)) {
-			system = TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis());
-		}
-		else if (unit.equals(TimeUnit.MICROSECONDS)) {
-			system = TimeUnit.MILLISECONDS.toMicros(System.currentTimeMillis());
-		}
-		else if (unit.equals(TimeUnit.MILLISECONDS)) {
-			system = System.currentTimeMillis();
-		}
-		else if (unit.equals(TimeUnit.MINUTES)) {
-			system = TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis());
-		}
-		else if (unit.equals(TimeUnit.NANOSECONDS)) {
-			system = TimeUnit.MILLISECONDS.toNanos(System.currentTimeMillis());
-		}
-		else if (unit.equals(TimeUnit.SECONDS)) {
-			system = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
-		}
-		long timeoutExpiredMs = system + timeout;
+		long timeoutExpiredMs = getSystem(unit, System.currentTimeMillis()) + timeout;
 		while (!isDone()) {
-			long waitMs = timeoutExpiredMs - system;
+			long waitMs = timeoutExpiredMs - getSystem(unit, System.currentTimeMillis());
 			if (waitMs <= 0) {
 				// timeout expired
 				return null;
@@ -104,4 +83,28 @@ public class Future<T> {
 		return result;
 	}
 
+	private long getSystem(TimeUnit unit, long time) {
+		long system = 0;
+		if (unit.equals(TimeUnit.DAYS))
+			system = TimeUnit.MILLISECONDS.toDays(time);
+		else if (unit.equals(TimeUnit.HOURS)) {
+			system = TimeUnit.MILLISECONDS.toHours(time);
+		}
+		else if (unit.equals(TimeUnit.MICROSECONDS)) {
+			system = TimeUnit.MILLISECONDS.toMicros(time);
+		}
+		else if (unit.equals(TimeUnit.MILLISECONDS)) {
+			system = time;
+		}
+		else if (unit.equals(TimeUnit.MINUTES)) {
+			system = TimeUnit.MILLISECONDS.toMinutes(time);
+		}
+		else if (unit.equals(TimeUnit.NANOSECONDS)) {
+			system = TimeUnit.MILLISECONDS.toNanos(time);
+		}
+		else if (unit.equals(TimeUnit.SECONDS)) {
+			system = TimeUnit.MILLISECONDS.toSeconds(time);
+		}
+		return system;
+	}
 }
