@@ -77,10 +77,18 @@ public class MessageBusImpl implements MessageBus {
 	public <T> Future<T> sendEvent(Event<T> e) {
 		Future<T> f = new Future<>();
 		eventFutureHashMap.put(e,f);
-		MicroService m = eventQueueHashMap_robin.get(e.getClass()).remove();
+		BlockingQueue<MicroService> robin = eventQueueHashMap_robin.get(e.getClass());
+		MicroService m;
+		synchronized (robin)
+		{
+			 m = robin.remove();
+			robin.add(m);
+		}
 		serviceQueueHashMap.get(m).add(e);
-		eventQueueHashMap_robin.get(e.getClass()).add(m);
-		m.notifyAll();
+		synchronized (m)
+		{
+			m.notifyAll();
+		}
 		return f;
 	}
 
