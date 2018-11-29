@@ -82,17 +82,25 @@ public class MessageBusImpl implements MessageBus {
 		Future<T> f = new Future<>();
 		eventFutureHashMap.put(e,f);
 		BlockingQueue<MicroService> robin = eventQueueHashMap_robin.get(e.getClass());
+		if(robin==null) // event that no one register for him
+			return  null;
 		MicroService m;
 		synchronized (robin)
 		{
-			 m = robin.remove();
-			robin.add(m);
+			try {
+				m = robin.take();
+				serviceQueueHashMap.get(m).add(e);
+				robin.add(m);
+			}
+			catch (InterruptedException g){
+				System.out.println(g.getMessage());
+			}
+
 		}
-		serviceQueueHashMap.get(m).add(e);
-		synchronized (m)
-		{
-			m.notifyAll();
-		}
+//		synchronized (m)
+//		{
+//			m.notifyAll();
+//		}
 		return f;
 	}
 
@@ -126,12 +134,20 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public Message awaitMessage(MicroService m) throws InterruptedException {
+	/*
 		synchronized (m) {
-			while(serviceQueueHashMap.get(m).isEmpty()) {
+
+			while (serviceQueueHashMap.get(m).isEmpty()) {
 				m.wait();
 			}
-			return serviceQueueHashMap.get(m).remove();
 		}
+		*/
+		BlockingQueue<Message>q= serviceQueueHashMap.get(m);
+		if(q!=null) {
+			Message msg = q.take();
+			return msg;
+		}
+		else return null;
 	}
 
 	

@@ -162,7 +162,9 @@ public abstract class MicroService implements Runnable {
            try {
                Message message=mb.awaitMessage(this);
                Callback c= callbacks.get(message);
-               c.call(message);
+               System.out.println("inLoop"+this.name);
+                if(c!=null) //TODO CHECK
+                    c.call(message);
            }
            catch (InterruptedException e){
                System.out.print(e.getMessage());
