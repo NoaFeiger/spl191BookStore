@@ -21,7 +21,7 @@ public class MessageBusImpl implements MessageBus {
 		eventFutureHashMap = new ConcurrentHashMap<>();
 		eventQueueHashMap_robin = new ConcurrentHashMap<>();
 		broadcastQueueHashMap = new ConcurrentHashMap<>();
-		System.out.println("messagebus ");
+		//System.out.println("messagebus ");
 	}
 
 	public static MessageBusImpl getInstance() {
@@ -68,8 +68,9 @@ public class MessageBusImpl implements MessageBus {
 		}
 		for ( MicroService m : broadcastQueueHashMap.get(b.getClass())){
 			synchronized(m) {  // TODO CHECK IF SYNCHRONIZED IS NEEDED
-				serviceQueueHashMap.get(m).add(b);
-			//	m.notifyAll();
+				boolean add = serviceQueueHashMap.get(m).add(b);
+				//	m.notifyAll();
+				System.out.println(add);
 			}
 		}
 
@@ -142,12 +143,9 @@ public class MessageBusImpl implements MessageBus {
 			}
 		}
 		*/
-		BlockingQueue<Message>q= serviceQueueHashMap.get(m);
-		if(q!=null) {
-			Message msg = q.take();
-			return msg;
-		}
-		else return null;
+		BlockingQueue<Message> q= serviceQueueHashMap.get(m);
+		Message msg = q.take();
+		return msg;
 	}
 
 	

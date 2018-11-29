@@ -35,7 +35,7 @@ public abstract class MicroService implements Runnable {
         this.terminated=false;
         this.mb=MessageBusImpl.getInstance();
         callbacks =new ConcurrentHashMap<>();
-        System.out.println("micro service "+this.name);
+        //System.out.println("micro service "+this.name);
     }
 
     /**
@@ -161,14 +161,15 @@ public abstract class MicroService implements Runnable {
         while (!terminated) {
            try {
                Message message=mb.awaitMessage(this);
-               Callback c= callbacks.get(message);
+               Callback c= callbacks.get(message.getClass());
                System.out.println("inLoop"+this.name);
-                if(c!=null) //TODO CHECK
+               if(c!=null) //TODO CHECK
                     c.call(message);
            }
            catch (InterruptedException e){
                System.out.print(e.getMessage());
            }
         }
+        mb.unregister(this);
     }
 }
