@@ -14,9 +14,10 @@ import bgu.spl.mics.MicroService;
 
 public class InventoryService extends MicroService{
 
-	public InventoryService() {
-		super("Change_This_Name");
-		// TODO Implement this
+	private Integer amount;
+	public InventoryService(String name,Integer amount) {
+		super(name);
+		this.amount=amount;
 	}
 
 	@Override

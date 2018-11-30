@@ -1,5 +1,7 @@
 package bgu.spl.mics.application.passiveObjects;
 
+import com.google.gson.JsonArray;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -19,7 +21,7 @@ public class Customer {
 	private LinkedList<OrderSchedule> orders;
 
 
-	public Customer(int id,String name, String address, Double distance, String creditcard_num,
+	public Customer(int id, String name, String address, Double distance, String creditcard_num,
 					Double creditcard_amount, LinkedList<OrderSchedule> orders) {
 		this.id = id;
 		this.name=name;
