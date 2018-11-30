@@ -1,5 +1,6 @@
 package bgu.spl.mics.application.passiveObjects;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -9,33 +10,50 @@ import java.util.List;
  * You may add fields and methods to this class as you see fit (including public methods).
  */
 public class Customer {
+	private  int id;
+	private String name;
+	private String address;
+	private Double distance;
+	private String creditcard_num;
+	private Double creditcard_amount;
+	private LinkedList<OrderSchedule> orders;
+
+
+	public Customer(int id,String name, String address, Double distance, String creditcard_num,
+					Double creditcard_amount, LinkedList<OrderSchedule> orders) {
+		this.id = id;
+		this.name=name;
+		this.address = address;
+		this.distance = distance;
+		this.creditcard_num = creditcard_num;
+		this.creditcard_amount = creditcard_amount;
+		this.orders = orders;
+	}
 
 	/**
      * Retrieves the name of the customer.
      */
 	public String getName() {
-		// TODO Implement this
-		return null;
+		return this.name;
 	}
 
 	/**
-     * Retrieves the ID of the customer  . 
+     * Retrieves the ID of the customer  .
      */
 	public int getId() {
-		// TODO Implement this
-		return 0;
+		return this.id;
 	}
-	
+
 	/**
-     * Retrieves the address of the customer.  
+     * Retrieves the address of the customer.
      */
 	public String getAddress() {
 		// TODO Implement this
 		return null;
 	}
-	
+
 	/**
-     * Retrieves the distance of the customer from the store.  
+     * Retrieves the distance of the customer from the store.
      */
 	public int getDistance() {
 		// TODO Implement this
