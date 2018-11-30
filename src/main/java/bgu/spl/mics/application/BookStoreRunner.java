@@ -2,6 +2,8 @@ package bgu.spl.mics.application;
 import bgu.spl.mics.application.passiveObjects.BookInventoryInfo;
 import bgu.spl.mics.application.passiveObjects.DeliveryVehicle;
 import bgu.spl.mics.application.passiveObjects.Inventory;
+import bgu.spl.mics.application.services.SellingService;
+import bgu.spl.mics.application.services.TimeService;
 import com.google.gson.*;
 import java.io.FileReader;
 import java.text.ParseException;
@@ -43,16 +45,29 @@ public class BookStoreRunner {
 
 
         JsonArray je_resources=jo.get("initialResources").getAsJsonArray();
-        DeliveryVehicle[] resource = new DeliveryVehicle[je_resources.size()];
-        for (int i = 0; i < je_resources.size(); i++) {
-            JsonObject source = (JsonObject) je_resources.get(i);
+        JsonArray vehicles= je_resources.get(0).getAsJsonObject().get("vehicles").getAsJsonArray();
+        DeliveryVehicle[] vehicle_array = new DeliveryVehicle[vehicles.size()];
+        for (int i = 0; i < vehicles.size(); i++) {
+            JsonObject source = (JsonObject) vehicles.get(i);
             Integer license = source.get("license").getAsInt();
+            System.out.println(license);
             Integer speed = source.get("speed").getAsInt();
-            resource[i] = new DeliveryVehicle(license, speed);
+            System.out.println(speed);
+            vehicle_array[i] = new DeliveryVehicle(license, speed);
         }
 
+        JsonObject services = jo.getAsJsonObject("services");
+        JsonObject time=services.get("time").getAsJsonObject();
+        Double speed=time.get("speed").getAsDouble();
+        System.out.println(speed);
+        Double duration=time.get("duration").getAsDouble();
+        System.out.println(duration);
+        // TimeService time_service=new TimeService(speed,duration,"time"); //TODO CHECK NAME
         //load to ResourcesHolder TODO
 
+        Integer selling_amount=services.get("selling").getAsInt();
+        System.out.println(selling_amount);
+      //  SellingService selling_service=new SellingService(selling_amount,"selling");
 
     }
 }
