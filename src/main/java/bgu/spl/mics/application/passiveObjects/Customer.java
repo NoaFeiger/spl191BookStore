@@ -2,6 +2,7 @@ package bgu.spl.mics.application.passiveObjects;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Passive data-object representing a customer of the store.
@@ -16,7 +17,7 @@ public class Customer {
 	private int distance;
 	private List<OrderReceipt> Receipts;
 	private int creditCard;
-	private int availableAmountInCreditCard;
+	private AtomicInteger availableAmountInCreditCard;
 	private LinkedList<OrderSchedule> orders;
 
 	public Customer (int id, String name, String address, int distance, int creditCard, int availableAmountInCreditCard, LinkedList<OrderSchedule> orders) {
@@ -84,6 +85,7 @@ public class Customer {
 	}
 
 	public void chargeCreditCard(int amount) {
+		synchronized (availableAmountInCreditCard) {
 		availableAmountInCreditCard = availableAmountInCreditCard - amount;
 	}
 	
