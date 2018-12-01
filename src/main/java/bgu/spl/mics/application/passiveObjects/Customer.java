@@ -17,14 +17,16 @@ public class Customer {
 	private List<OrderReceipt> Receipts;
 	private int creditCard;
 	private int availableAmountInCreditCard;
+	private LinkedList<OrderSchedule> orders;
 
-	public Customer (int id, String name, String address, int distance, int creditCard, int availableAmountInCreditCard) {
+	public Customer (int id, String name, String address, int distance, int creditCard, int availableAmountInCreditCard, LinkedList<OrderSchedule> orders) {
 		this.id = id;
 		this.name = name;
 		this.address = address;
 		this.distance = distance;
 		this.creditCard = creditCard;
 		this.availableAmountInCreditCard = availableAmountInCreditCard;
+		this.orders = orders;
 		Receipts = new LinkedList<>();
 	}
 	/**
