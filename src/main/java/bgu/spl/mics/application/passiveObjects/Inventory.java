@@ -63,8 +63,11 @@ public class Inventory {
      * 			second should reduce by one the number of books of the desired type.
      */
 	public OrderResult take (String book) {
-		
-		return null;
+		if (checkAvailabiltyAndGetPrice(book)!=-1) {
+			books.get(book).reduceAmount();
+			return OrderResult.SUCCESSFULLY_TAKEN;
+		}
+		return OrderResult.NOT_IN_STOCK;
 	}
 	
 	
@@ -76,7 +79,9 @@ public class Inventory {
      * @return the price of the book if it is available, -1 otherwise.
      */
 	public int checkAvailabiltyAndGetPrice(String book) {
-		//TODO: Implement this
+		if (books.get(book).getAmountInInventory() > 0) {
+			return books.get(book).getPrice();
+		}
 		return -1;
 	}
 	
