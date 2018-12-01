@@ -13,14 +13,12 @@ public class BookInventoryInfo {
 	private String  bookTitle;
 	private Integer amountInInventory;
 	private int price;
-	private Semaphore semaphore;
 
 	public BookInventoryInfo(String bookTitle, int amountInInventory, int price)
 	{
 		this.amountInInventory=amountInInventory;
 		this.price=price;
 		this.bookTitle=bookTitle;
-		semaphore = new Semaphore(amountInInventory);
 	}
 
 	/**
@@ -51,15 +49,8 @@ public class BookInventoryInfo {
 	}
 	
 	public void reduceAmount() {
-//		synchronized (amountInInventory) {
-//			amountInInventory = amountInInventory -1;
-//		}
-		semaphore.acquire();
-		try {
+		synchronized (amountInInventory) {
 			amountInInventory = amountInInventory -1;
-		}finally{
-			//release resource
-			semaphore.release();
 		}
 	}
 
