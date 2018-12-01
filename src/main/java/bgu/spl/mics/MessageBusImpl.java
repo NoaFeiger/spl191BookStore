@@ -67,11 +67,9 @@ public class MessageBusImpl implements MessageBus {
 			return;
 		}
 		for ( MicroService m : broadcastQueueHashMap.get(b.getClass())){
-			synchronized(m) {  // TODO CHECK IF SYNCHRONIZED IS NEEDED
-				boolean add = serviceQueueHashMap.get(m).add(b);
-				//	m.notifyAll();
-				System.out.println(add);
-			}
+			//synchronized(m) {  // TODO CHECK IF SYNCHRONIZED IS NEEDED
+				serviceQueueHashMap.get(m).add(b);
+		//	}
 		}
 
 

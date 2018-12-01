@@ -1,6 +1,11 @@
 package bgu.spl.mics.application.passiveObjects;
 
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Passive object representing the store finance management. 
@@ -12,13 +17,26 @@ package bgu.spl.mics.application.passiveObjects;
  * You can add ONLY private fields and methods to this class as you see fit.
  */
 public class MoneyRegister {
-	
+	private static MoneyRegister instance = null;
+	private List<OrderReceipt> orderReceipts;
+	private Integer totalEarnings;
+
+	private MoneyRegister() {
+		orderReceipts = new LinkedList<>();
+		totalEarnings = 0;
+	}
 	/**
      * Retrieves the single instance of this class.
      */
 	public static MoneyRegister getInstance() {
-		//TODO: Implement this
-		return null;
+		if(instance == null) {
+			synchronized (MoneyRegister.class) {
+				if(instance == null) {
+					instance = new MoneyRegister();
+				}
+			}
+		}
+		return instance;
 	}
 	
 	/**
@@ -27,15 +45,17 @@ public class MoneyRegister {
      * @param r		The receipt to save in the money register.
      */
 	public void file (OrderReceipt r) {
-		//TODO: Implement this.
+		orderReceipts.add(r);
+		synchronized (totalEarnings) {
+			totalEarnings = totalEarnings + r.getPrice();
+		}
 	}
 	
 	/**
      * Retrieves the current total earnings of the store.  
      */
 	public int getTotalEarnings() {
-		//TODO: Implement this
-		return 0;
+		return totalEarnings;
 	}
 	
 	/**
@@ -44,7 +64,7 @@ public class MoneyRegister {
      * @param amount 	amount to charge
      */
 	public void chargeCreditCard(Customer c, int amount) {
-		// TODO Implement this
+		//c.chargeCreditCard(amount);
 	}
 	
 	/**
@@ -53,6 +73,17 @@ public class MoneyRegister {
      * This method is called by the main method in order to generate the output.
      */
 	public void printOrderReceipts(String filename) {
-		//TODO: Implement this
+		try
+		{
+			FileOutputStream fos =
+					new FileOutputStream(filename);
+			ObjectOutputStream oos = new ObjectOutputStream(fos);
+			oos.writeObject(orderReceipts);
+			oos.close();
+			fos.close();
+		}catch(IOException ioe)
+		{
+			ioe.printStackTrace();
+		}
 	}
 }
