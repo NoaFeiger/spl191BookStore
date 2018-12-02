@@ -13,10 +13,10 @@ import bgu.spl.mics.MicroService;
  * You MAY change constructor signatures and even add new public constructors.
  */
 public class SellingService extends MicroService{
-
-	public SellingService() {
-		super("Change_This_Name");
-		// TODO Implement this
+	private int amount;
+	public SellingService(int amount,String name) {
+		super(name);
+		this.amount=amount;
 	}
 
 	@Override

@@ -56,28 +56,28 @@ public class BookStoreRunner {
 
         JsonObject services = jo.getAsJsonObject("services");
         JsonObject time=services.get("time").getAsJsonObject();
-        Integer speed=time.get("speed").getAsInt();
+        Double speed=time.get("speed").getAsDouble();
         System.out.println(speed);
-        Integer duration=time.get("duration").getAsInt();
+        Double duration=time.get("duration").getAsDouble();
         System.out.println(duration);
-        // TimeService time_service=new TimeService(speed,duration,"time"); //TODO CHECK NAME
+         TimeService time_service=new TimeService(speed,duration,"time"); //TODO CHECK NAME
         //load to ResourcesHolder TODO
 
         Integer selling_amount=services.get("selling").getAsInt();
         System.out.println(selling_amount);
-        //  SellingService selling_service=new SellingService(selling_amount,"selling");
+          SellingService selling_service=new SellingService(selling_amount,"selling");
 
         Integer inventory_amount=services.get("inventoryService").getAsInt();
         System.out.println(inventory_amount);
-        //InventoryService inventoryService=new InventoryService("inventoryService",inventory_amount);
+        InventoryService inventoryService=new InventoryService("inventoryService",inventory_amount);
 
         Integer logistic_amount=services.get("logistics").getAsInt();
         System.out.println(logistic_amount);
-        //LogisticsService logistic_service=new LogisticsService("logisticService",logistic_amount);
+        LogisticsService logistic_service=new LogisticsService("logisticService",logistic_amount);
 
         Integer resourcesService_amount=services.get("resourcesService").getAsInt();
         System.out.println(resourcesService_amount);
-        // ResourceService resource_service=new ResourceService("resourcesService",resourcesService_amount);
+         ResourceService resource_service=new ResourceService("resourcesService",resourcesService_amount);
 
         JsonArray customers_array = services.get("customers").getAsJsonArray();
         Customer[] customers = new Customer[customers_array.size()];

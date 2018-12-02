@@ -1,4 +1,5 @@
 package bgu.spl.mics.application.passiveObjects;
+
 import java.io.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -22,7 +23,6 @@ public class Inventory {
 		books = new ConcurrentHashMap<> ();
 		print = new ConcurrentHashMap<> ();
 	}
-
 
 	/**
      * Retrieves the single instance of this class.

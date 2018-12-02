@@ -1,5 +1,7 @@
 package bgu.spl.mics.application.passiveObjects;
 
+import com.google.gson.JsonArray;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -38,21 +40,21 @@ public class Customer {
 	}
 
 	/**
-     * Retrieves the ID of the customer  . 
+     * Retrieves the ID of the customer  .
      */
 	public int getId() {
 		return id;
 	}
-	
+
 	/**
-     * Retrieves the address of the customer.  
+     * Retrieves the address of the customer.
      */
 	public String getAddress() {
 		return address;
 	}
-	
+
 	/**
-     * Retrieves the distance of the customer from the store.  
+     * Retrieves the distance of the customer from the store.
      */
 	public int getDistance() {
 		return distance;
