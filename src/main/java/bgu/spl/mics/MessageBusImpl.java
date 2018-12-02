@@ -94,7 +94,6 @@ public class MessageBusImpl implements MessageBus {
 			catch (InterruptedException g){
 				System.out.println(g.getMessage());
 			}
-
 		}
 //		synchronized (m)
 //		{

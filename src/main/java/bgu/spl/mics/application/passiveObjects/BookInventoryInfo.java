@@ -53,5 +53,4 @@ public class BookInventoryInfo {
 			amountInInventory = amountInInventory -1;
 		}
 	}
-
 }

@@ -17,7 +17,7 @@ public class Customer {
 	private int distance;
 	private List<OrderReceipt> Receipts;
 	private int creditCard;
-	private AtomicInteger availableAmountInCreditCard;
+	private int availableAmountInCreditCard;
 	private LinkedList<OrderSchedule> orders;
 
 	public Customer (int id, String name, String address, int distance, int creditCard, int availableAmountInCreditCard, LinkedList<OrderSchedule> orders) {
@@ -85,8 +85,8 @@ public class Customer {
 	}
 
 	public void chargeCreditCard(int amount) {
-		synchronized (availableAmountInCreditCard) {
-		availableAmountInCreditCard = availableAmountInCreditCard - amount;
+		//synchronized (availableAmountInCreditCard) {
+			availableAmountInCreditCard = availableAmountInCreditCard - amount;
 	}
 	
 }
