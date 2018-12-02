@@ -10,7 +10,7 @@ import static org.junit.Assert.*;
 public class FutureTest {
     Future<String> f = null;
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         f = new Future<>();
     }
 
