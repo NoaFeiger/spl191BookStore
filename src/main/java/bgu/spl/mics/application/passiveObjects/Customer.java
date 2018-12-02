@@ -5,6 +5,9 @@ import com.google.gson.JsonArray;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Passive data-object representing a customer of the store.
@@ -19,8 +22,9 @@ public class Customer {
 	private int distance;
 	private List<OrderReceipt> Receipts;
 	private int creditCard;
-	private int availableAmountInCreditCard;
+	private Integer availableAmountInCreditCard;
 	private LinkedList<OrderSchedule> orders;
+
 
 	public Customer (int id, String name, String address, int distance, int creditCard, int availableAmountInCreditCard, LinkedList<OrderSchedule> orders) {
 		this.id = id;
@@ -31,6 +35,7 @@ public class Customer {
 		this.availableAmountInCreditCard = availableAmountInCreditCard;
 		this.orders = orders;
 		Receipts = new LinkedList<>();
+
 	}
 	/**
      * Retrieves the name of the customer.
@@ -87,8 +92,9 @@ public class Customer {
 	}
 
 	public void chargeCreditCard(int amount) {
-		//synchronized (availableAmountInCreditCard) {
-			availableAmountInCreditCard = availableAmountInCreditCard - amount;
+		synchronized (availableAmountInCreditCard) {
+			availableAmountInCreditCard -= amount;
+		}
 	}
 	
 }

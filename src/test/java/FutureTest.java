@@ -14,7 +14,6 @@ public class FutureTest {
         f = new Future<>();
     }
 
-
     @Test
     public void get() {
         f.resolve("good");

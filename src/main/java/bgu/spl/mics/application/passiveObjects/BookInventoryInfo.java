@@ -1,6 +1,9 @@
 package bgu.spl.mics.application.passiveObjects;
 
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Passive data-object representing a information about a certain book in the inventory.
@@ -13,12 +16,18 @@ public class BookInventoryInfo {
 	private String  bookTitle;
 	private Integer amountInInventory;
 	private int price;
+	private ReadWriteLock rwLock;
+	private Lock writeLock;
+	private Lock readLock;
 
 	public BookInventoryInfo(String bookTitle, int amountInInventory, int price)
 	{
 		this.amountInInventory=amountInInventory;
 		this.price=price;
 		this.bookTitle=bookTitle;
+		rwLock = new ReentrantReadWriteLock();
+		writeLock = rwLock.writeLock();
+		readLock = rwLock.readLock();
 	}
 
 	/**
@@ -50,7 +59,7 @@ public class BookInventoryInfo {
 	
 	public void reduceAmount() {
 		synchronized (amountInInventory) {
-			amountInInventory = amountInInventory -1;
+			amountInInventory -= 1;
 		}
 	}
 }

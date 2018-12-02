@@ -2,7 +2,9 @@ package bgu.spl.mics.application.passiveObjects;
 
 import bgu.spl.mics.Future;
 
-import java.util.Vector;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Semaphore;
 
 /**
  * Passive object representing the resource manager.
@@ -15,9 +17,11 @@ import java.util.Vector;
  */
 public class ResourcesHolder {
 	private static ResourcesHolder instance = null;
-	private Vector<DeliveryVehicle> deliveryVehicles;
-	private ResourcesHolder() {
+	private BlockingQueue<DeliveryVehicle> deliveryVehicles;
+	private Semaphore semaphore;
 
+	private ResourcesHolder() {
+		deliveryVehicles = new LinkedBlockingQueue<>();
 	}
 	/**
      * Retrieves the single instance of this class.
@@ -41,8 +45,21 @@ public class ResourcesHolder {
      * 			{@link DeliveryVehicle} when completed.   
      */
 	public Future<DeliveryVehicle> acquireVehicle() {
-		//TODO: Implement this
-		return null;
+		Future<DeliveryVehicle> f = new Future<>();
+		try {
+			semaphore.acquire();
+			try {
+				DeliveryVehicle d = deliveryVehicles.take();
+				f.resolve(d);
+			}
+			finally {
+				deliveryVehicles.add(f.get());
+				semaphore.release();
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		return f;
 	}
 	
 	/**
@@ -61,7 +78,10 @@ public class ResourcesHolder {
      * @param vehicles	Array of {@link DeliveryVehicle} instances to store.
      */
 	public void load(DeliveryVehicle[] vehicles) {
-		//TODO: Implement this
+		for (int i = 0; i < vehicles.length; i++) {
+			deliveryVehicles.add(vehicles[i]);
+		}
+		semaphore = new Semaphore(vehicles.length);
 	}
 
 }

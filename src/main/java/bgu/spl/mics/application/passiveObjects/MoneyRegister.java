@@ -4,8 +4,8 @@ package bgu.spl.mics.application.passiveObjects;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Passive object representing the store finance management. 
@@ -18,11 +18,11 @@ import java.util.List;
  */
 public class MoneyRegister {
 	private static MoneyRegister instance = null;
-	private List<OrderReceipt> orderReceipts;
+	private BlockingQueue<OrderReceipt> orderReceipts;
 	private Integer totalEarnings;
 
 	private MoneyRegister() {
-		orderReceipts = new LinkedList<>();
+		orderReceipts = new LinkedBlockingQueue<>();
 		totalEarnings = 0;
 	}
 	/**
@@ -47,7 +47,7 @@ public class MoneyRegister {
 	public void file (OrderReceipt r) {
 		orderReceipts.add(r);
 		synchronized (totalEarnings) {
-			totalEarnings = totalEarnings + r.getPrice();
+			totalEarnings += r.getPrice();
 		}
 	}
 	

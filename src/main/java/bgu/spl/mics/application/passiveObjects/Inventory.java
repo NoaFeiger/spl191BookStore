@@ -108,7 +108,6 @@ public class Inventory {
 			oos.writeObject(print);
 			oos.close();
 			fos.close();
-			System.out.printf("Serialized HashMap data is saved in " + filename);
 		}catch(IOException ioe)
 		{
 			ioe.printStackTrace();
