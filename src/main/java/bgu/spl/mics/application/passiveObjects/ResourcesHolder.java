@@ -52,9 +52,8 @@ public class ResourcesHolder {
 				DeliveryVehicle d = deliveryVehicles.take();
 				f.resolve(d);
 			}
-			finally {
-				deliveryVehicles.add(f.get());
-				semaphore.release();
+			catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -69,7 +68,8 @@ public class ResourcesHolder {
      * @param vehicle	{@link DeliveryVehicle} to be released.
      */
 	public void releaseVehicle(DeliveryVehicle vehicle) {
-		//TODO: Implement this
+		deliveryVehicles.add(vehicle);
+		semaphore.release();
 	}
 	
 	/**
