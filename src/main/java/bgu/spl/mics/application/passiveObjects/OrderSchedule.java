@@ -1,8 +1,7 @@
 package bgu.spl.mics.application.passiveObjects;
 
 public class OrderSchedule {
-
-    private String book_name;
+   private String book_name;
    private Integer tick;
 
    public OrderSchedule(String book_name,Integer tick){
