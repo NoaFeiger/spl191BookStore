@@ -52,6 +52,7 @@ public class APIService extends MicroService{
 				if (TickBooksHashmap.containsKey(tick)) {
 					LinkedList<String> books = TickBooksHashmap.get(tick);
 					for (String bookname : books) {
+						System.out.println("book: " + bookname);
 						Future<OrderReceipt> fOrder =
 								sendEvent(new BookOrderEvent<OrderReceipt>(customer,bookname,tick));
 						Futures.add(fOrder);

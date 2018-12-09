@@ -8,8 +8,8 @@ import com.google.gson.*;
 
 import java.io.*;
 import java.text.ParseException;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /** This is the Main class of the application. You should parse the input file,
@@ -166,6 +166,9 @@ public class BookStoreRunner {
         printCustomersMap(CustomersMap, args[1]);
         Inventory.getInstance().printInventoryToFile(args[2]);
         MoneyRegister.getInstance().printOrderReceipts(args[3]);
+        DeserializeHashmMap(args[1]);
+        DeserializeConcurrentHashmMap(args[2]);
+
     }
 
     private static void printCustomersMap(HashMap customers, String filename) {
@@ -180,6 +183,64 @@ public class BookStoreRunner {
         }catch(IOException ioe)
         {
             ioe.printStackTrace();
+        }
+    }
+    private static void DeserializeHashmMap(String filename) {
+        HashMap map;
+        try
+        {
+            FileInputStream fis = new FileInputStream(filename);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            map = (HashMap) ois.readObject();
+            ois.close();
+            fis.close();
+        }catch(IOException ioe)
+        {
+            ioe.printStackTrace();
+            return;
+        }catch(ClassNotFoundException c)
+        {
+            System.out.println("Class not found");
+            c.printStackTrace();
+            return;
+        }
+        System.out.println("Deserialized HashMap..");
+        // Display content using Iterator
+        Set set = map.entrySet();
+        Iterator iterator = set.iterator();
+        while(iterator.hasNext()) {
+            Map.Entry mentry = (Map.Entry)iterator.next();
+            System.out.print("key: "+ mentry.getKey() + " & Value: ");
+            System.out.println(mentry.getValue());
+        }
+    }
+    private static void DeserializeConcurrentHashmMap(String filename) {
+        ConcurrentHashMap map;
+        try
+        {
+            FileInputStream fis = new FileInputStream(filename);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            map = (ConcurrentHashMap) ois.readObject();
+            ois.close();
+            fis.close();
+        }catch(IOException ioe)
+        {
+            ioe.printStackTrace();
+            return;
+        }catch(ClassNotFoundException c)
+        {
+            System.out.println("Class not found");
+            c.printStackTrace();
+            return;
+        }
+        System.out.println("Deserialized HashMap..");
+        // Display content using Iterator
+        Set set = map.entrySet();
+        Iterator iterator = set.iterator();
+        while(iterator.hasNext()) {
+            ConcurrentHashMap.Entry mentry = (ConcurrentHashMap.Entry)iterator.next();
+            System.out.print("key: "+ mentry.getKey() + " & Value: ");
+            System.out.println(mentry.getValue());
         }
     }
 }

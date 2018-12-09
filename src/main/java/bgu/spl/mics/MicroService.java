@@ -158,16 +158,16 @@ public abstract class MicroService implements Runnable {
     @Override
     public final void run() {
         mb.register(this);
-        System.out.println(getName());
+//        System.out.println(getName());
         initialize();
-        System.out.println("init");
+//        System.out.println("init");
         while (!terminated) {
            try {
-               System.out.println("beforeawait");
+//               System.out.println("beforeawait");
                Message message=mb.awaitMessage(this);
-               System.out.println("afterawait");
+//               System.out.println("afterawait");
                Callback c= callbacks.get(message.getClass());
-               System.out.println("inLoop"+this.name);
+//               System.out.println("inLoop"+this.name);
                if(c!=null) //TODO CHECK
                     c.call(message);
            }

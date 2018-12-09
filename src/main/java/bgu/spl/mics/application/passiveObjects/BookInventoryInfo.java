@@ -1,6 +1,7 @@
 package bgu.spl.mics.application.passiveObjects;
 
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -14,7 +15,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class BookInventoryInfo {
 
 	private String  bookTitle;
-	private Integer amountInInventory;
+	private AtomicInteger amountInInventory;
 	private int price;
 //	private ReadWriteLock rwLock;
 //	private Lock writeLock;
@@ -23,7 +24,7 @@ public class BookInventoryInfo {
 
 	public BookInventoryInfo(String bookTitle, int amountInInventory, int price)
 	{
-		this.amountInInventory=amountInInventory;
+		this.amountInInventory = new AtomicInteger(amountInInventory);
 		this.price=price;
 		this.bookTitle=bookTitle;
 //		rwLock = new ReentrantReadWriteLock();
@@ -47,7 +48,9 @@ public class BookInventoryInfo {
      * @return amount of available books.      
      */
 	public int getAmountInInventory() {
-		return amountInInventory;
+		synchronized (amountInInventory) {
+			return amountInInventory.intValue();
+		}
 	}
 
 	/**
@@ -60,8 +63,14 @@ public class BookInventoryInfo {
 	}
 	
 	public void reduceAmount() {
+		System.out.println("");
+		System.out.println("beforereducesync");
+		System.out.println("");
 		synchronized (amountInInventory) {
-			amountInInventory -= 1;
+			System.out.println("");
+			System.out.println("inreduce");
+			System.out.println("");
+			amountInInventory.decrementAndGet();
 		}
 	}
 }

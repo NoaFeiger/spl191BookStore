@@ -25,7 +25,7 @@
         "name": "Bruria",
         "address": "NewYork 123",
         "distance":33,
-        "creditCard":{"number":67890,"amount":88},
+        "creditCard":{"number":67890,"amount":1000},
         "orderSchedule": [
             {"bookTitle": "Harry Poter", "tick": 3},
             {"bookTitle": "The Hunger Games", "tick": 3}

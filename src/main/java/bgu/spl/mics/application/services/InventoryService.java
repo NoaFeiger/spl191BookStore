@@ -31,6 +31,7 @@ public class InventoryService extends MicroService{
 		subscribeEvent(TakeEvent.class, new Callback<TakeEvent>() {
 			@Override
 			public void call(TakeEvent c) {
+				System.out.println("BEFORE TAKE-IN CALL");
 				OrderResult or = inventory.take(c.getBookname());
 				if (or==OrderResult.SUCCESSFULLY_TAKEN) {
 					complete(c, true);
