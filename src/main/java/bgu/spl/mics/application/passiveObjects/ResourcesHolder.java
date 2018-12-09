@@ -2,7 +2,9 @@ package bgu.spl.mics.application.passiveObjects;
 
 import bgu.spl.mics.Future;
 
-import java.util.Vector;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Semaphore;
 
 /**
  * Passive object representing the resource manager.
@@ -15,23 +17,35 @@ import java.util.Vector;
  */
 public class ResourcesHolder {
 	private static ResourcesHolder instance = null;
-	private Vector<DeliveryVehicle> deliveryVehicles;
-	private ResourcesHolder() {
+	private BlockingQueue<DeliveryVehicle> deliveryVehicles;
+	private BlockingQueue<Future<DeliveryVehicle>> futureNotResolves;
+	private Semaphore semaphore;
 
+	private static class SingletonHolder {
+		private static ResourcesHolder instance = new ResourcesHolder();
+	}
+
+	public static ResourcesHolder getInstance() {
+		return SingletonHolder.instance;
+	}
+
+	private ResourcesHolder() {
+		deliveryVehicles = new LinkedBlockingQueue<>();
+		futureNotResolves = new LinkedBlockingQueue<>();
 	}
 	/**
      * Retrieves the single instance of this class.
      */
-	public static ResourcesHolder getInstance() {
-		if(instance == null) {
-			synchronized (ResourcesHolder.class) {
-				if(instance == null) {
-					instance = new ResourcesHolder();
-				}
-			}
-		}
-		return instance;
-	}
+//	public static ResourcesHolder getInstance() {
+//		if(instance == null) {
+//			synchronized (ResourcesHolder.class) {
+//				if(instance == null) {
+//					instance = new ResourcesHolder();
+//				}
+//			}
+//		}
+//		return instance;
+//	}
 	
 	/**
      * Tries to acquire a vehicle and gives a future object which will
@@ -41,8 +55,32 @@ public class ResourcesHolder {
      * 			{@link DeliveryVehicle} when completed.   
      */
 	public Future<DeliveryVehicle> acquireVehicle() {
-		//TODO: Implement this
-		return null;
+		Future<DeliveryVehicle> f = new Future<>();
+		if (semaphore.tryAcquire()) {
+			DeliveryVehicle d = null;
+			try {
+				d = deliveryVehicles.take();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			f.resolve(d);
+		}
+		else {
+			futureNotResolves.add(f);
+		}
+		return f;
+//		try {
+//			semaphore.acquire();
+//			try {
+//
+//			}
+//			catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
+
 	}
 	
 	/**
@@ -52,7 +90,21 @@ public class ResourcesHolder {
      * @param vehicle	{@link DeliveryVehicle} to be released.
      */
 	public void releaseVehicle(DeliveryVehicle vehicle) {
-		//TODO: Implement this
+		synchronized (futureNotResolves) {
+			if (!futureNotResolves.isEmpty()) {
+				try {
+					Future<DeliveryVehicle> f = futureNotResolves.take();
+					f.resolve(vehicle);
+				}
+				catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			else { // no future waiting
+				deliveryVehicles.add(vehicle);
+				semaphore.release();
+			}
+		}
 	}
 	
 	/**
@@ -61,7 +113,10 @@ public class ResourcesHolder {
      * @param vehicles	Array of {@link DeliveryVehicle} instances to store.
      */
 	public void load(DeliveryVehicle[] vehicles) {
-		//TODO: Implement this
+		for (int i = 0; i < vehicles.length; i++) {
+			deliveryVehicles.add(vehicles[i]);
+		}
+		semaphore = new Semaphore(vehicles.length);
 	}
 
 }

@@ -5,6 +5,10 @@ import com.google.gson.JsonArray;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Passive data-object representing a customer of the store.
@@ -19,7 +23,7 @@ public class Customer {
 	private int distance;
 	private List<OrderReceipt> Receipts;
 	private int creditCard;
-	private int availableAmountInCreditCard;
+	private AtomicInteger availableAmountInCreditCard;
 	private LinkedList<OrderSchedule> orders;
 
 	public Customer (int id, String name, String address, int distance, int creditCard, int availableAmountInCreditCard, LinkedList<OrderSchedule> orders) {
@@ -28,7 +32,7 @@ public class Customer {
 		this.address = address;
 		this.distance = distance;
 		this.creditCard = creditCard;
-		this.availableAmountInCreditCard = availableAmountInCreditCard;
+		this.availableAmountInCreditCard = new AtomicInteger(availableAmountInCreditCard);
 		this.orders = orders;
 		Receipts = new LinkedList<>();
 	}
@@ -76,7 +80,9 @@ public class Customer {
      * @return Amount of money left.   
      */
 	public int getAvailableCreditAmount() {
-		return availableAmountInCreditCard;
+		synchronized (availableAmountInCreditCard) {
+			return availableAmountInCreditCard.intValue();
+		}
 	}
 	
 	/**
@@ -87,8 +93,22 @@ public class Customer {
 	}
 
 	public void chargeCreditCard(int amount) {
-		//synchronized (availableAmountInCreditCard) {
-			availableAmountInCreditCard = availableAmountInCreditCard - amount;
+		synchronized (availableAmountInCreditCard) {
+			availableAmountInCreditCard.addAndGet(-1*amount); //todo check
+		}
 	}
-	
+
+	public LinkedList<OrderSchedule> getOrders() {
+		return orders;
+	}
+
+	public AtomicInteger getAvailableAmountInCreditCard() {
+		synchronized (availableAmountInCreditCard) {
+			return availableAmountInCreditCard;
+		}
+	}
+
+	public void addReciept(OrderReceipt o) {
+		Receipts.add(o);
+	}
 }

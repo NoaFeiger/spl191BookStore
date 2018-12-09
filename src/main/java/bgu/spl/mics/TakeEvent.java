@@ -1,12 +1,13 @@
 package bgu.spl.mics;
 
-public class CheckAvailabiltyEvent<Integer> implements Event {
+public class TakeEvent<Boolean> implements Event<Boolean> {
     private String bookname;
-    public CheckAvailabiltyEvent (String bookname) {
+
+    public TakeEvent(String bookname) {
         this.bookname = bookname;
     }
+
     public String getBookname() {
         return bookname;
     }
-
 }

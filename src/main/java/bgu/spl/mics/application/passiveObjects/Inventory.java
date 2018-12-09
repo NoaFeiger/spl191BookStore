@@ -19,6 +19,14 @@ public class Inventory {
 	private ConcurrentHashMap<String, BookInventoryInfo> books;
 	private ConcurrentHashMap<String, Integer> print;
 
+	private static class SingletonHolder {
+		private static Inventory instance = new Inventory();
+	}
+
+	public static Inventory getInstance() {
+		return SingletonHolder.instance;
+	}
+
 	private Inventory() {
 		books = new ConcurrentHashMap<> ();
 		print = new ConcurrentHashMap<> ();
@@ -28,16 +36,16 @@ public class Inventory {
      * Retrieves the single instance of this class.
      */
 
-	public static Inventory getInstance() {
-		if(instance == null) {
-			synchronized (Inventory.class) {
-				if(instance == null) {
-					instance = new Inventory();
-				}
-			}
-		}
-		return instance;
-	}
+//	public static Inventory getInstance() {
+//		if(instance == null) {
+//			synchronized (Inventory.class) {
+//				if(instance == null) {
+//					instance = new Inventory();
+//				}
+//			}
+//		}
+//		return instance;
+//	}
 	
 	/**
      * Initializes the store inventory. This method adds all the items given to the store
@@ -63,9 +71,12 @@ public class Inventory {
      * 			second should reduce by one the number of books of the desired type.
      */
 	public OrderResult take (String book) {
-		if (checkAvailabiltyAndGetPrice(book)!=-1) {
+		if (books.get(book).semaphore.tryAcquire()) {
+//			if (checkAvailabiltyAndGetPrice(book)!=-1) {
 			books.get(book).reduceAmount();
 			return OrderResult.SUCCESSFULLY_TAKEN;
+//			}
+//			return OrderResult.NOT_IN_STOCK;
 		}
 		return OrderResult.NOT_IN_STOCK;
 	}
@@ -108,10 +119,13 @@ public class Inventory {
 			oos.writeObject(print);
 			oos.close();
 			fos.close();
-			System.out.printf("Serialized HashMap data is saved in " + filename);
 		}catch(IOException ioe)
 		{
 			ioe.printStackTrace();
 		}
+	}
+
+	private ConcurrentHashMap getHashMap() {
+		return books;
 	}
 }

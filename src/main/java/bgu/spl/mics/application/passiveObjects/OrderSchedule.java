@@ -24,7 +24,4 @@ public class OrderSchedule {
     public void setTick(Integer tick) {
         this.tick = tick;
     }
-
-
-
 }
