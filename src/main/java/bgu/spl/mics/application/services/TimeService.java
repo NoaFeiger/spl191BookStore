@@ -27,6 +27,7 @@ public class TimeService extends MicroService{
 	private int currentTick;
 	private int numOfServices;
 	private int countInitialize;
+
 	private CountdownLatchWraper countdownLatchWraper=CountdownLatchWraper.getInstance();
 
 	public TimeService(long speed,int duration,String name, int numOfServices) {
@@ -35,7 +36,7 @@ public class TimeService extends MicroService{
 		this.speed=speed;
 		this.currentTick = 1;
 		this.numOfServices = numOfServices;
-		countInitialize = 0;
+		this.countInitialize = 0;
 	}
 
 	@Override
@@ -55,12 +56,20 @@ public class TimeService extends MicroService{
                 }
             }
         });
+		subscribeBroadcast(TerminateBroadcast.class, new Callback<TerminateBroadcast>() {
+			@Override
+			public void call(TerminateBroadcast c) {
+				terminate();
+			}
+		});
+
 //		countdownLatchWraper.await();
 //		this.timer = new Timer();
 //		timer.schedule(new sendBroadcastTask(), 100, speed);
 	}
 
-    private void TimerStart() {
+
+	private void TimerStart() {
         this.timer = new Timer();
 		timer.schedule(new sendBroadcastTask(), 100, speed);
     }

@@ -1,9 +1,6 @@
 package bgu.spl.mics.application.services;
 
-import bgu.spl.mics.Callback;
-import bgu.spl.mics.CheckAvailabiltyEvent;
-import bgu.spl.mics.MicroService;
-import bgu.spl.mics.TakeEvent;
+import bgu.spl.mics.*;
 import bgu.spl.mics.application.passiveObjects.*;
 
 /**
@@ -44,6 +41,14 @@ public class InventoryService extends MicroService{
 
 			}
 		});
+		subscribeBroadcast(TerminateBroadcast.class, new Callback<TerminateBroadcast>() {
+			@Override
+			public void call(TerminateBroadcast c) {
+				terminate();
+			}
+		});
+		sendBroadcast( new FinishInitializeBroadcast());
+
 	}
 
 }
