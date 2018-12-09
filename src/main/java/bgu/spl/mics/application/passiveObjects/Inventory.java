@@ -71,9 +71,12 @@ public class Inventory {
      * 			second should reduce by one the number of books of the desired type.
      */
 	public OrderResult take (String book) {
-		if (checkAvailabiltyAndGetPrice(book)!=-1) {
+		if (books.get(book).semaphore.tryAcquire()) {
+//			if (checkAvailabiltyAndGetPrice(book)!=-1) {
 			books.get(book).reduceAmount();
 			return OrderResult.SUCCESSFULLY_TAKEN;
+//			}
+//			return OrderResult.NOT_IN_STOCK;
 		}
 		return OrderResult.NOT_IN_STOCK;
 	}
@@ -120,5 +123,9 @@ public class Inventory {
 		{
 			ioe.printStackTrace();
 		}
+	}
+
+	private ConcurrentHashMap getHashMap() {
+		return books;
 	}
 }

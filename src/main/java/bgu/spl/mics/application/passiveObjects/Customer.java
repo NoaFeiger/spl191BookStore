@@ -80,7 +80,9 @@ public class Customer {
      * @return Amount of money left.   
      */
 	public int getAvailableCreditAmount() {
-		return availableAmountInCreditCard.intValue();
+		synchronized (availableAmountInCreditCard) {
+			return availableAmountInCreditCard.intValue();
+		}
 	}
 	
 	/**
@@ -101,7 +103,9 @@ public class Customer {
 	}
 
 	public AtomicInteger getAvailableAmountInCreditCard() {
-		return availableAmountInCreditCard;
+		synchronized (availableAmountInCreditCard) {
+			return availableAmountInCreditCard;
+		}
 	}
 
 	public void addReciept(OrderReceipt o) {

@@ -9,6 +9,9 @@ public class TickBroadcast implements Broadcast {
 
     public TickBroadcast() {
         super();
+    }
 
+    public AtomicInteger getTick() {
+        return tick;
     }
 }

@@ -68,7 +68,7 @@ public class BookStoreRunner {
         countServices = countServices + selling_amount;
         System.out.println(selling_amount);
         for (int i = 0; i < selling_amount; i++) {
-            SellingService selling_service=new SellingService(selling_amount,"selling " + i);
+            SellingService selling_service=new SellingService("selling " + i);
         }
 
         Integer inventory_amount=services.get("inventoryService").getAsInt();

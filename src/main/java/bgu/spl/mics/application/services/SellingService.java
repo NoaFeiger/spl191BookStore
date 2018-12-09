@@ -1,6 +1,7 @@
 package bgu.spl.mics.application.services;
 
-import bgu.spl.mics.MicroService;
+import bgu.spl.mics.application.passiveObjects.*;
+import bgu.spl.mics.*;
 
 /**
  * Selling service in charge of taking orders from customers.
@@ -13,16 +14,54 @@ import bgu.spl.mics.MicroService;
  * You MAY change constructor signatures and even add new public constructors.
  */
 public class SellingService extends MicroService{
-	private int amount;
-	public SellingService(int amount,String name) {
+	private int proccessTick;
+	private int issuedTick;
+	private MoneyRegister moneyRegister;
+	public SellingService(String name) {
 		super(name);
-		this.amount=amount;
+		moneyRegister = MoneyRegister.getInstance();
 	}
 
 	@Override
 	protected void initialize() {
-		// TODO Implement this
-		
+		subscribeEvent(BookOrderEvent.class, new Callback<BookOrderEvent>() {
+			@Override
+			public void call(BookOrderEvent c) {
+				Future<Integer> fProccessTick = sendEvent(new TimeRequestEvent<Integer>());
+				proccessTick = fProccessTick.get();
+				Future<Integer> fPrice = sendEvent(new CheckAvailabiltyEvent<Integer>(c.getBookname()));
+				int price = fPrice.get();
+				if (price!=-1) {
+					complete(c, null);
+				}
+				else {
+					synchronized (c.getCustomer().getAvailableAmountInCreditCard()) { //todo check
+						int money = c.getCustomer().getAvailableAmountInCreditCard().intValue();
+						if (money-price>=0) {
+							Future<Boolean> fTake = sendEvent(new TakeEvent<>(c.getBookname()));
+							Boolean answer = fTake.get();
+							if (answer) {
+								moneyRegister.chargeCreditCard(c.getCustomer(), price);
+								Future<Integer> fIssued = sendEvent(new TimeRequestEvent<Integer>());
+								issuedTick = fProccessTick.get();
+								Customer customer = c.getCustomer();
+								OrderReceipt orderReceipt = new OrderReceipt
+										(getName(), customer.getId(), c.getBookname(),
+												price, issuedTick, c.getOrderTick(), proccessTick);
+								moneyRegister.file(orderReceipt);
+								complete(c, orderReceipt);
+							}
+							else {
+								complete(c, null);
+							}
+						}
+						else {
+							complete(c, null);
+						}
+					}
+				}
+			}
+		});
 	}
 
 }

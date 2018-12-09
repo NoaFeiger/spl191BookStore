@@ -177,5 +177,4 @@ public abstract class MicroService implements Runnable {
     private void setTick(AtomicInteger tick) {
         this.tick = tick;
     }
-
 }
