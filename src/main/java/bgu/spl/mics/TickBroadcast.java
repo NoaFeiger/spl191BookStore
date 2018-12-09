@@ -7,8 +7,9 @@ public class TickBroadcast implements Broadcast {
     private AtomicInteger tick;
     private Timer timer;
 
-    public TickBroadcast() {
+    public TickBroadcast(int tick) {
         super();
+        this.tick=new AtomicInteger(tick);
     }
 
     public AtomicInteger getTick() {

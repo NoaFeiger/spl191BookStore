@@ -58,9 +58,9 @@ public class BookStoreRunner {
 
         JsonObject services = jo.getAsJsonObject("services");
         JsonObject time=services.get("time").getAsJsonObject();
-        Double speed=time.get("speed").getAsDouble();
+        long speed=time.get("speed").getAsLong();
         System.out.println(speed);
-        Double duration=time.get("duration").getAsDouble();
+        Integer duration=time.get("duration").getAsInt();
         System.out.println(duration);
         TimeService time_service=new TimeService(speed,duration,"time");
 
