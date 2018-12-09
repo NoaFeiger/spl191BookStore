@@ -13,9 +13,8 @@ import bgu.spl.mics.MicroService;
  */
 public class LogisticsService extends MicroService {
 	private Integer amount;
-	public LogisticsService(String name,Integer amount) {
+	public LogisticsService(String name) {
 		super(name);
-		this.amount=amount;
 	}
 
 	@Override

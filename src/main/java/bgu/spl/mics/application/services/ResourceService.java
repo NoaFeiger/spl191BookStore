@@ -13,10 +13,8 @@ import bgu.spl.mics.MicroService;
  */
 public class ResourceService extends MicroService{
 
-	private Integer amount;
-	public ResourceService(String name,Integer amount) {
+	public ResourceService(String name) {
 		super(name);
-		this.amount=amount;
 	}
 
 	@Override

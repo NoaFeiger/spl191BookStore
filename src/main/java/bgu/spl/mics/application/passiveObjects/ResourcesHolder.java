@@ -18,24 +18,34 @@ import java.util.concurrent.Semaphore;
 public class ResourcesHolder {
 	private static ResourcesHolder instance = null;
 	private BlockingQueue<DeliveryVehicle> deliveryVehicles;
+	private BlockingQueue<Future<DeliveryVehicle>> futureNotResolves;
 	private Semaphore semaphore;
+
+	private static class SingletonHolder {
+		private static ResourcesHolder instance = new ResourcesHolder();
+	}
+
+	public static ResourcesHolder getInstance() {
+		return SingletonHolder.instance;
+	}
 
 	private ResourcesHolder() {
 		deliveryVehicles = new LinkedBlockingQueue<>();
+		futureNotResolves = new LinkedBlockingQueue<>();
 	}
 	/**
      * Retrieves the single instance of this class.
      */
-	public static ResourcesHolder getInstance() {
-		if(instance == null) {
-			synchronized (ResourcesHolder.class) {
-				if(instance == null) {
-					instance = new ResourcesHolder();
-				}
-			}
-		}
-		return instance;
-	}
+//	public static ResourcesHolder getInstance() {
+//		if(instance == null) {
+//			synchronized (ResourcesHolder.class) {
+//				if(instance == null) {
+//					instance = new ResourcesHolder();
+//				}
+//			}
+//		}
+//		return instance;
+//	}
 	
 	/**
      * Tries to acquire a vehicle and gives a future object which will
@@ -46,19 +56,31 @@ public class ResourcesHolder {
      */
 	public Future<DeliveryVehicle> acquireVehicle() {
 		Future<DeliveryVehicle> f = new Future<>();
-		try {
-			semaphore.acquire();
+		if (semaphore.tryAcquire()) {
+			DeliveryVehicle d = null;
 			try {
-				DeliveryVehicle d = deliveryVehicles.take();
-				f.resolve(d);
-			}
-			catch (InterruptedException e) {
+				d = deliveryVehicles.take();
+			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+			f.resolve(d);
+		}
+		else {
+			futureNotResolves.add(f);
 		}
 		return f;
+//		try {
+//			semaphore.acquire();
+//			try {
+//
+//			}
+//			catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
+
 	}
 	
 	/**
@@ -68,8 +90,21 @@ public class ResourcesHolder {
      * @param vehicle	{@link DeliveryVehicle} to be released.
      */
 	public void releaseVehicle(DeliveryVehicle vehicle) {
-		deliveryVehicles.add(vehicle);
-		semaphore.release();
+		synchronized (futureNotResolves) {
+			if (!futureNotResolves.isEmpty()) {
+				try {
+					Future<DeliveryVehicle> f = futureNotResolves.take();
+					f.resolve(vehicle);
+				}
+				catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			else { // no future waiting
+				deliveryVehicles.add(vehicle);
+				semaphore.release();
+			}
+		}
 	}
 	
 	/**

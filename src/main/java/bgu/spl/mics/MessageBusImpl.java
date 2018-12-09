@@ -24,16 +24,23 @@ public class MessageBusImpl implements MessageBus {
 		//System.out.println("messagebus ");
 	}
 
-	public static MessageBusImpl getInstance() {
-		if(instance == null) {
-			synchronized (MessageBusImpl.class) {
-				if(instance == null) {
-					instance = new MessageBusImpl();
-				}
-			}
-		}
-		return instance;
+	private static class SingletonHolder {
+		private static MessageBusImpl instance = new MessageBusImpl();
 	}
+
+	public static MessageBusImpl getInstance() {
+		return SingletonHolder.instance;
+	}
+//	public static MessageBusImpl getInstance() {
+//		if(instance == null) {
+//			synchronized (MessageBusImpl.class) {
+//				if(instance == null) {
+//					instance = new MessageBusImpl();
+//				}
+//			}
+//		}
+//		return instance;
+//	}
 
 	@Override
 	public <T> void subscribeEvent(Class<? extends Event<T>> type, MicroService m) {
@@ -58,7 +65,6 @@ public class MessageBusImpl implements MessageBus {
 	@Override
 	public <T> void complete(Event<T> e, T result) {
 		eventFutureHashMap.get(e).resolve(result);
-
 	}
 
 	@Override
@@ -67,9 +73,9 @@ public class MessageBusImpl implements MessageBus {
 			return;
 		}
 		for ( MicroService m : broadcastQueueHashMap.get(b.getClass())){
-			//synchronized(m) {  // TODO CHECK IF SYNCHRONIZED IS NEEDED
+			synchronized(serviceQueueHashMap.get(m)) {  // TODO CHECK IF SYNCHRONIZED IS NEEDED
 				serviceQueueHashMap.get(m).add(b);
-		//	}
+			}
 		}
 
 

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Passive object representing the store finance management. 
@@ -19,25 +20,34 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class MoneyRegister {
 	private static MoneyRegister instance = null;
 	private BlockingQueue<OrderReceipt> orderReceipts;
-	private Integer totalEarnings;
+	private AtomicInteger totalEarnings;
+
+	private static class SingletonHolder {
+		private static MoneyRegister instance = new MoneyRegister();
+	}
+
+	public static MoneyRegister getInstance() {
+		return SingletonHolder.instance;
+	}
 
 	private MoneyRegister() {
 		orderReceipts = new LinkedBlockingQueue<>();
-		totalEarnings = 0;
+		totalEarnings = new AtomicInteger(0);
 	}
+
 	/**
      * Retrieves the single instance of this class.
      */
-	public static MoneyRegister getInstance() {
-		if(instance == null) {
-			synchronized (MoneyRegister.class) {
-				if(instance == null) {
-					instance = new MoneyRegister();
-				}
-			}
-		}
-		return instance;
-	}
+//	public static MoneyRegister getInstance() {
+//		if(instance == null) {
+//			synchronized (MoneyRegister.class) {
+//				if(instance == null) {
+//					instance = new MoneyRegister();
+//				}
+//			}
+//		}
+//		return instance;
+//	}
 	
 	/**
      * Saves an order receipt in the money register.
@@ -46,16 +56,17 @@ public class MoneyRegister {
      */
 	public void file (OrderReceipt r) {
 		orderReceipts.add(r);
-		synchronized (totalEarnings) {
-			totalEarnings += r.getPrice();
-		}
+		totalEarnings.addAndGet(r.getPrice());
+//		synchronized (totalEarnings) {
+//			totalEarnings += r.getPrice();
+//		}
 	}
 	
 	/**
      * Retrieves the current total earnings of the store.  
      */
 	public int getTotalEarnings() {
-		return totalEarnings;
+		return totalEarnings.intValue();
 	}
 	
 	/**

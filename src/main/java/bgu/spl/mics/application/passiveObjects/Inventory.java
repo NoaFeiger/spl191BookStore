@@ -19,6 +19,14 @@ public class Inventory {
 	private ConcurrentHashMap<String, BookInventoryInfo> books;
 	private ConcurrentHashMap<String, Integer> print;
 
+	private static class SingletonHolder {
+		private static Inventory instance = new Inventory();
+	}
+
+	public static Inventory getInstance() {
+		return SingletonHolder.instance;
+	}
+
 	private Inventory() {
 		books = new ConcurrentHashMap<> ();
 		print = new ConcurrentHashMap<> ();
@@ -28,16 +36,16 @@ public class Inventory {
      * Retrieves the single instance of this class.
      */
 
-	public static Inventory getInstance() {
-		if(instance == null) {
-			synchronized (Inventory.class) {
-				if(instance == null) {
-					instance = new Inventory();
-				}
-			}
-		}
-		return instance;
-	}
+//	public static Inventory getInstance() {
+//		if(instance == null) {
+//			synchronized (Inventory.class) {
+//				if(instance == null) {
+//					instance = new Inventory();
+//				}
+//			}
+//		}
+//		return instance;
+//	}
 	
 	/**
      * Initializes the store inventory. This method adds all the items given to the store

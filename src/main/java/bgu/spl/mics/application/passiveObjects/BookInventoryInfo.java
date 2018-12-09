@@ -16,18 +16,20 @@ public class BookInventoryInfo {
 	private String  bookTitle;
 	private Integer amountInInventory;
 	private int price;
-	private ReadWriteLock rwLock;
-	private Lock writeLock;
-	private Lock readLock;
+//	private ReadWriteLock rwLock;
+//	private Lock writeLock;
+//	private Lock readLock;
+	protected Semaphore semaphore;
 
 	public BookInventoryInfo(String bookTitle, int amountInInventory, int price)
 	{
 		this.amountInInventory=amountInInventory;
 		this.price=price;
 		this.bookTitle=bookTitle;
-		rwLock = new ReentrantReadWriteLock();
-		writeLock = rwLock.writeLock();
-		readLock = rwLock.readLock();
+//		rwLock = new ReentrantReadWriteLock();
+//		writeLock = rwLock.writeLock();
+//		readLock = rwLock.readLock();
+		semaphore = new Semaphore(amountInInventory);
 	}
 
 	/**

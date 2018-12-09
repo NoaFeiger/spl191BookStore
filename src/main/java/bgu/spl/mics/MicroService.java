@@ -1,5 +1,6 @@
 package bgu.spl.mics;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * The MicroService is an abstract class that any micro-service in the system
@@ -20,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>
  */
 public abstract class MicroService implements Runnable {
-
+    private AtomicInteger tick;
     private boolean terminated;
     private final String name;
     private MessageBus mb;
@@ -172,4 +173,9 @@ public abstract class MicroService implements Runnable {
         }
         mb.unregister(this);
     }
+
+    private void setTick(AtomicInteger tick) {
+        this.tick = tick;
+    }
+
 }

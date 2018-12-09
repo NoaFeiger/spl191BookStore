@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -22,9 +23,8 @@ public class Customer {
 	private int distance;
 	private List<OrderReceipt> Receipts;
 	private int creditCard;
-	private Integer availableAmountInCreditCard;
+	private AtomicInteger availableAmountInCreditCard;
 	private LinkedList<OrderSchedule> orders;
-
 
 	public Customer (int id, String name, String address, int distance, int creditCard, int availableAmountInCreditCard, LinkedList<OrderSchedule> orders) {
 		this.id = id;
@@ -32,10 +32,9 @@ public class Customer {
 		this.address = address;
 		this.distance = distance;
 		this.creditCard = creditCard;
-		this.availableAmountInCreditCard = availableAmountInCreditCard;
+		this.availableAmountInCreditCard = new AtomicInteger(availableAmountInCreditCard);
 		this.orders = orders;
 		Receipts = new LinkedList<>();
-
 	}
 	/**
      * Retrieves the name of the customer.
@@ -81,7 +80,7 @@ public class Customer {
      * @return Amount of money left.   
      */
 	public int getAvailableCreditAmount() {
-		return availableAmountInCreditCard;
+		return availableAmountInCreditCard.intValue();
 	}
 	
 	/**
@@ -93,8 +92,19 @@ public class Customer {
 
 	public void chargeCreditCard(int amount) {
 		synchronized (availableAmountInCreditCard) {
-			availableAmountInCreditCard -= amount;
+			availableAmountInCreditCard.addAndGet(-1*amount); //todo check
 		}
 	}
-	
+
+	public LinkedList<OrderSchedule> getOrders() {
+		return orders;
+	}
+
+	public AtomicInteger getAvailableAmountInCreditCard() {
+		return availableAmountInCreditCard;
+	}
+
+	public void addReciept(OrderReceipt o) {
+		Receipts.add(o);
+	}
 }

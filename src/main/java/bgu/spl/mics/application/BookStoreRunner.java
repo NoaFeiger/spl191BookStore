@@ -14,6 +14,8 @@ import java.util.LinkedList;
  */
 public class BookStoreRunner {
     public static void main(String[] args) throws FileNotFoundException, ParseException { //TODO CHECK EXCEPTION
+        // todo check if including timeservice
+        int countServices = 0;
         // receive file name from the user
         String fileName = args[0];
         // read json file
@@ -36,11 +38,8 @@ public class BookStoreRunner {
             bookInventoryInfos[i] = new BookInventoryInfo(bookTitle, amount,price);
         }
 
-        //
-        //load to Inventory TODO
-
-        // initialize source object
-
+        //load to Inventory
+        Inventory.getInstance().load(bookInventoryInfos);
 
         JsonArray je_resources=jo.get("initialResources").getAsJsonArray();
         JsonArray vehicles= je_resources.get(0).getAsJsonObject().get("vehicles").getAsJsonArray();
@@ -54,33 +53,48 @@ public class BookStoreRunner {
             vehicle_array[i] = new DeliveryVehicle(license, speed);
         }
 
+        //load to ResourcesHolder
+        ResourcesHolder.getInstance().load(vehicle_array);
+
         JsonObject services = jo.getAsJsonObject("services");
         JsonObject time=services.get("time").getAsJsonObject();
         Double speed=time.get("speed").getAsDouble();
         System.out.println(speed);
         Double duration=time.get("duration").getAsDouble();
         System.out.println(duration);
-         TimeService time_service=new TimeService(speed,duration,"time"); //TODO CHECK NAME
-        //load to ResourcesHolder TODO
+        TimeService time_service=new TimeService(speed,duration,"time");
 
         Integer selling_amount=services.get("selling").getAsInt();
+        countServices = countServices + selling_amount;
         System.out.println(selling_amount);
-          SellingService selling_service=new SellingService(selling_amount,"selling");
+        for (int i = 0; i < selling_amount; i++) {
+            SellingService selling_service=new SellingService(selling_amount,"selling " + i);
+        }
 
         Integer inventory_amount=services.get("inventoryService").getAsInt();
+        countServices = countServices + inventory_amount;
         System.out.println(inventory_amount);
-        InventoryService inventoryService=new InventoryService("inventoryService",inventory_amount);
+        for (int i = 0; i < inventory_amount; i++) {
+            InventoryService inventoryService=new InventoryService("inventoryService " + i);
+        }
 
         Integer logistic_amount=services.get("logistics").getAsInt();
+        countServices = countServices + logistic_amount;
         System.out.println(logistic_amount);
-        LogisticsService logistic_service=new LogisticsService("logisticService",logistic_amount);
+        for (int i = 0; i < logistic_amount; i++) {
+            LogisticsService logistic_service=new LogisticsService("logisticService " + i);
+        }
 
         Integer resourcesService_amount=services.get("resourcesService").getAsInt();
+        countServices = countServices + resourcesService_amount;
         System.out.println(resourcesService_amount);
-         ResourceService resource_service=new ResourceService("resourcesService",resourcesService_amount);
+        for (int i = 0; i < resourcesService_amount; i++) {
+            ResourceService resource_service=new ResourceService("resourcesService " + i);
+        }
 
         JsonArray customers_array = services.get("customers").getAsJsonArray();
         Customer[] customers = new Customer[customers_array.size()];
+        countServices = countServices + customers_array.size();
         for (int i = 0; i < customers_array.size(); i++) {
             JsonObject customer = customers_array.get(i).getAsJsonObject();
             int id=customer.get("id").getAsInt(); //TODO CHECK INT
@@ -109,6 +123,7 @@ public class BookStoreRunner {
                 orders_list.add(new OrderSchedule(bookTitle_scedule, tick));
             }
             customers[i] = new Customer(id,name1,address,distance,credit_num,amount,orders_list);
+            APIService apiService = new APIService(customers[i], "APIService " + i);
         }
 
     }
