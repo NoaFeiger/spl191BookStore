@@ -25,13 +25,17 @@ public class TimeService extends MicroService{
 	private int duration;
 	private Timer timer;
 	private int currentTick;
+	private int numOfServices;
+	private int countInitialize;
 	private CountdownLatchWraper countdownLatchWraper=CountdownLatchWraper.getInstance();
 
-	public TimeService(long speed,int duration,String name) {
+	public TimeService(long speed,int duration,String name, int numOfServices) {
 		super(name);
 		this.duration=duration;
 		this.speed=speed;
 		this.currentTick = 1;
+		this.numOfServices = numOfServices;
+		countInitialize = 0;
 	}
 
 	@Override
@@ -42,10 +46,24 @@ public class TimeService extends MicroService{
 				complete(c, currentTick);
 			}
 		});
-		countdownLatchWraper.await();
-		this.timer = new Timer();
-		timer.schedule(new sendBroadcastTask(), 100, speed);
+		subscribeBroadcast(FinishInitializeBroadcast.class, new Callback<FinishInitializeBroadcast>() {
+            @Override
+            public void call(FinishInitializeBroadcast c) {
+                countInitialize++;
+                if (countInitialize==numOfServices) {
+                    TimerStart();
+                }
+            }
+        });
+//		countdownLatchWraper.await();
+//		this.timer = new Timer();
+//		timer.schedule(new sendBroadcastTask(), 100, speed);
 	}
+
+    private void TimerStart() {
+        this.timer = new Timer();
+		timer.schedule(new sendBroadcastTask(), 100, speed);
+    }
 
 	private class sendBroadcastTask extends TimerTask {
 		@Override
@@ -53,15 +71,11 @@ public class TimeService extends MicroService{
 			currentTick++;
 			if (currentTick < duration) { //TODO CHECK EQUAL
 				sendBroadcast(new TickBroadcast(currentTick));
-				if (currentTick == 1) {
-					countFirst.await();
-				}
 			}
 			else {
-				sendBroadcast(new TerminationMessage());
+				sendBroadcast(new TerminateBroadcast());
 				cancel();
 				timer.cancel();
-				countReceipt.countDown();
 			}
 		}
 	}

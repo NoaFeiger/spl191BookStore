@@ -62,7 +62,6 @@ public class BookStoreRunner {
         System.out.println(speed);
         Integer duration=time.get("duration").getAsInt();
         System.out.println(duration);
-        TimeService time_service=new TimeService(speed,duration,"time");
 
         Integer selling_amount=services.get("selling").getAsInt();
         countServices = countServices + selling_amount;
@@ -125,6 +124,6 @@ public class BookStoreRunner {
             customers[i] = new Customer(id,name1,address,distance,credit_num,amount,orders_list);
             APIService apiService = new APIService(customers[i], "APIService " + i);
         }
-
+        TimeService time_service=new TimeService(speed,duration,"time",countServices);
     }
 }
