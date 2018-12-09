@@ -33,6 +33,7 @@ public class APIService extends MicroService{
 		this.customer = C;
 		this.orderSchedule = C.getOrders();
 		this.Futures = new LinkedList<>();
+		this.TickBooksHashmap = new HashMap<>();
 		for (int i = 0; i < orderSchedule.size(); i++) {
 			int tick = orderSchedule.get(i).getTick();
 			if (!TickBooksHashmap.containsKey(tick)) {

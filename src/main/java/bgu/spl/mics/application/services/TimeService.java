@@ -50,6 +50,7 @@ public class TimeService extends MicroService{
             @Override
             public void call(FinishInitializeBroadcast c) {
                 countInitialize++;
+                System.out.println("count:" + countInitialize);
                 if (countInitialize==numOfServices) {
                     TimerStart();
                 }
@@ -69,6 +70,7 @@ public class TimeService extends MicroService{
 		@Override
 		public void run() {
 			currentTick++;
+			System.out.println("curr: " + currentTick);
 			if (currentTick < duration) { //TODO CHECK EQUAL
 				sendBroadcast(new TickBroadcast(currentTick));
 			}

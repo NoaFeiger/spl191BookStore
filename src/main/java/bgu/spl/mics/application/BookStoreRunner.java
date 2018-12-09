@@ -1,10 +1,14 @@
 package bgu.spl.mics.application;
+import bgu.spl.mics.MessageBus;
+import bgu.spl.mics.MessageBusImpl;
+import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.passiveObjects.*;
 import bgu.spl.mics.application.services.*;
 import com.google.gson.*;
-import java.io.FileReader;
+
+import java.io.*;
 import java.text.ParseException;
-import java.io.FileNotFoundException;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 
@@ -23,7 +27,9 @@ public class BookStoreRunner {
         FileReader reader = new FileReader(fileName);
         JsonParser parser = new JsonParser();
         JsonObject jo = (JsonObject) parser.parse(reader);
-
+        //
+        LinkedList<Thread> servicesToRun = new LinkedList<>();
+        HashMap<Integer, Customer> CustomersMap = new HashMap<>();
         //initialize bookInventoryInfo
         JsonArray je_bookInfo = jo.get("initialInventory").getAsJsonArray();
         BookInventoryInfo[] bookInventoryInfos = new BookInventoryInfo[je_bookInfo.size()];
@@ -68,13 +74,15 @@ public class BookStoreRunner {
         System.out.println(selling_amount);
         for (int i = 0; i < selling_amount; i++) {
             SellingService selling_service=new SellingService("selling " + i);
+            servicesToRun.add(new Thread(selling_service));
         }
 
         Integer inventory_amount=services.get("inventoryService").getAsInt();
         countServices = countServices + inventory_amount;
         System.out.println(inventory_amount);
         for (int i = 0; i < inventory_amount; i++) {
-            InventoryService inventoryService=new InventoryService("inventoryService " + i);
+            InventoryService inventory_service=new InventoryService("inventoryService " + i);
+            servicesToRun.add(new Thread(inventory_service));
         }
 
         Integer logistic_amount=services.get("logistics").getAsInt();
@@ -82,6 +90,7 @@ public class BookStoreRunner {
         System.out.println(logistic_amount);
         for (int i = 0; i < logistic_amount; i++) {
             LogisticsService logistic_service=new LogisticsService("logisticService " + i);
+            servicesToRun.add(new Thread(logistic_service));
         }
 
         Integer resourcesService_amount=services.get("resourcesService").getAsInt();
@@ -89,6 +98,7 @@ public class BookStoreRunner {
         System.out.println(resourcesService_amount);
         for (int i = 0; i < resourcesService_amount; i++) {
             ResourceService resource_service=new ResourceService("resourcesService " + i);
+            servicesToRun.add(new Thread(resource_service));
         }
 
         JsonArray customers_array = services.get("customers").getAsJsonArray();
@@ -122,8 +132,54 @@ public class BookStoreRunner {
                 orders_list.add(new OrderSchedule(bookTitle_scedule, tick));
             }
             customers[i] = new Customer(id,name1,address,distance,credit_num,amount,orders_list);
-            APIService apiService = new APIService(customers[i], "APIService " + i);
+            CustomersMap.put(customers[i].getId(), customers[i]);
+            APIService api_service = new APIService(customers[i], "APIService " + i);
+            servicesToRun.add(new Thread(api_service));
         }
+        System.out.println("Before1");
         TimeService time_service=new TimeService(speed,duration,"time",countServices);
+        System.out.println("Before2");
+        Thread timeThread = new Thread(time_service);
+        timeThread.start();
+        System.out.println("Before3");
+        try {
+            Thread.sleep(5000); //todo check
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Before");
+        for (Thread thread : servicesToRun) {
+            thread.start();
+        }
+        try {
+            timeThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        for (Thread thread : servicesToRun) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        printCustomersMap(CustomersMap, args[1]);
+        Inventory.getInstance().printInventoryToFile(args[2]);
+        MoneyRegister.getInstance().printOrderReceipts(args[3]);
+    }
+
+    private static void printCustomersMap(HashMap customers, String filename) {
+        try
+        {
+            FileOutputStream fos =
+                    new FileOutputStream(filename);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(customers);
+            oos.close();
+            fos.close();
+        }catch(IOException ioe)
+        {
+            ioe.printStackTrace();
+        }
     }
 }
