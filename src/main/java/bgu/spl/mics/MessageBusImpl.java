@@ -113,7 +113,7 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public void unregister(MicroService m) {
-		m.terminate();
+		//m.terminate();
 		for ( BlockingQueue<MicroService> q : eventQueueHashMap_robin.values()){
 			synchronized(q) {
 				q.remove(m);
@@ -128,6 +128,11 @@ public class MessageBusImpl implements MessageBus {
 			for (Message mes : serviceQueueHashMap.get(m)) {
 				if (mes instanceof Event) {
 					eventFutureHashMap.get(mes).resolve(null);
+				}
+				try {
+					serviceQueueHashMap.get(m).take();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
 			}
 		}

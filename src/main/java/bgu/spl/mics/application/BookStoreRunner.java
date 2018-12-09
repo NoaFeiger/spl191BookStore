@@ -142,11 +142,11 @@ public class BookStoreRunner {
         Thread timeThread = new Thread(time_service);
         timeThread.start();
         System.out.println("Before3");
-        try {
-            Thread.sleep(5000); //todo check
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            Thread.sleep(5000); //todo check
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         System.out.println("Before");
         for (Thread thread : servicesToRun) {
             thread.start();
