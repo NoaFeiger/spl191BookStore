@@ -31,6 +31,14 @@ public class LogisticsService extends MicroService {
 
 			}
 		});
+		subscribeBroadcast(TerminateBroadcast.class, new Callback<TerminateBroadcast>() {
+			@Override
+			public void call(TerminateBroadcast c) {
+				terminate();
+			}
+		});
+		sendBroadcast( new FinishInitializeBroadcast());
+
 	}
 
 }

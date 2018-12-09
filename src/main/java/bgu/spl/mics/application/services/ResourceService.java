@@ -37,5 +37,13 @@ public class ResourceService extends MicroService {
 				complete(c,true);
 			}
 		});
+		subscribeBroadcast(TerminateBroadcast.class, new Callback<TerminateBroadcast>() {
+			@Override
+			public void call(TerminateBroadcast c) {
+				terminate();
+			}
+		});
+		sendBroadcast( new FinishInitializeBroadcast());
+
 	}
 }
