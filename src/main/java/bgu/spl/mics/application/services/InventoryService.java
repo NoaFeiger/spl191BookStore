@@ -17,10 +17,9 @@ import bgu.spl.mics.application.passiveObjects.*;
  */
 
 public class InventoryService extends MicroService{
-	private Inventory inventory;
+	private Inventory inventory  = Inventory.getInstance();
 	public InventoryService(String name) {
 		super(name);
-		inventory = Inventory.getInstance();
 	}
 
 	@Override

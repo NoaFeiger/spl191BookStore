@@ -16,10 +16,9 @@ import bgu.spl.mics.*;
 public class SellingService extends MicroService{
 	private int proccessTick;
 	private int issuedTick;
-	private MoneyRegister moneyRegister;
+	private MoneyRegister moneyRegister = MoneyRegister.getInstance();
 	public SellingService(String name) {
 		super(name);
-		moneyRegister = MoneyRegister.getInstance();
 	}
 
 	@Override

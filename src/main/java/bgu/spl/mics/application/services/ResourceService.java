@@ -14,12 +14,10 @@ import bgu.spl.mics.application.passiveObjects.*;
  */
 public class ResourceService extends MicroService {
 
-	private ResourcesHolder resourcesHolder;
+	private ResourcesHolder resourcesHolder = ResourcesHolder.getInstance();
 
 	public ResourceService(String name) {
-
 		super(name);
-		resourcesHolder = ResourcesHolder.getInstance();
 	}
 
 	@Override
