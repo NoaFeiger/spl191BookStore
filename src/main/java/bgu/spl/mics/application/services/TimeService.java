@@ -5,7 +5,6 @@ import bgu.spl.mics.MicroService;
 import bgu.spl.mics.TimeRequestEvent;
 import bgu.spl.mics.application.passiveObjects.*;
 import bgu.spl.mics.*;
-import bgu.spl.mics.application.services.CountdownLatchWraper;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -27,8 +26,6 @@ public class TimeService extends MicroService{
 	private int currentTick;
 	private int numOfServices;
 	private int countInitialize;
-
-	private CountdownLatchWraper countdownLatchWraper=CountdownLatchWraper.getInstance();
 
 	public TimeService(long speed,int duration,String name, int numOfServices) {
 		super(name);

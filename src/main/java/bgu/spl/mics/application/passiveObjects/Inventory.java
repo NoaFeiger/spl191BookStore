@@ -72,7 +72,6 @@ public class Inventory {
      * 			second should reduce by one the number of books of the desired type.
      */
 	public OrderResult take (String book) {
-		System.out.println("TAKE METHOD");
 		if (books.get(book).semaphore.tryAcquire()) {
 //			if (checkAvailabiltyAndGetPrice(book)!=-1) {
 			books.get(book).reduceAmount();
