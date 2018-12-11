@@ -9,7 +9,7 @@ public class ReleaseEvent<Boolean> implements Event<Boolean> {
     public ReleaseEvent(DeliveryVehicle deliver) {
         this.deliver = deliver;
     }
-    public DeliveryVehicle getDeliver() {
+    public DeliveryVehicle getDeliveryVehicle() {
         return deliver;
     }
 

@@ -74,9 +74,6 @@ public class Inventory {
 		System.out.println("TAKE METHOD");
 		if (books.get(book).semaphore.tryAcquire()) {
 //			if (checkAvailabiltyAndGetPrice(book)!=-1) {
-			System.out.println("");
-			System.out.println("beforereduce");
-			System.out.println("");
 			books.get(book).reduceAmount();
 			return OrderResult.SUCCESSFULLY_TAKEN;
 //			}

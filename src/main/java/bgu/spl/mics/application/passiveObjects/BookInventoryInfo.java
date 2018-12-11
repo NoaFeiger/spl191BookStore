@@ -63,13 +63,7 @@ public class BookInventoryInfo {
 	}
 	
 	public void reduceAmount() {
-		System.out.println("");
-		System.out.println("beforereducesync");
-		System.out.println("");
 		synchronized (amountInInventory) {
-			System.out.println("");
-			System.out.println("inreduce");
-			System.out.println("");
 			amountInInventory.decrementAndGet();
 		}
 	}

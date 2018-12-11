@@ -115,14 +115,14 @@ public class MessageBusImpl implements MessageBus {
 	public void unregister(MicroService m) {
 		//m.terminate();
 		for ( BlockingQueue<MicroService> q : eventQueueHashMap_robin.values()){
-			synchronized(q) {
+//			synchronized(q) {
 				q.remove(m);
-			}
+//			}
 		}
 		for ( BlockingQueue<MicroService> q : broadcastQueueHashMap.values()){
-			synchronized(q) {
+//			synchronized(q) {
 				q.remove(m);
-			}
+//			}
 		}
 		synchronized(serviceQueueHashMap.get(m)) {
 			for (Message mes : serviceQueueHashMap.get(m)) {
@@ -135,8 +135,9 @@ public class MessageBusImpl implements MessageBus {
 					e.printStackTrace();
 				}
 			}
+			serviceQueueHashMap.remove(m);
 		}
-		serviceQueueHashMap.remove(m);
+
 	}
 
 	@Override

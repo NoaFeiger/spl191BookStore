@@ -28,20 +28,20 @@ public class SellingService extends MicroService{
 			public void call(BookOrderEvent c) {
 				System.out.println("START SELLING");
 				Future<Integer> fProccessTick = sendEvent(new TimeRequestEvent<Integer>());
-				System.out.println("AFTER fProccessTick");
+//				System.out.println("AFTER fProccessTick");
 				proccessTick = fProccessTick.get();
-				System.out.println("AFTER fProccessTickGET " + proccessTick);
+//				System.out.println("AFTER fProccessTickGET " + proccessTick);
 				Future<Integer> fPrice = sendEvent(new CheckAvailabiltyEvent<Integer>(c.getBookname()));
-				System.out.println("AFTER fPrice");
+//				System.out.println("AFTER fPrice");
 				int price = fPrice.get();
-				System.out.println("price: " + price);
+//				System.out.println("price: " + price);
 				if (price==-1) {
 					complete(c, null);
 				}
 				else {
 					synchronized (c.getCustomer().getAvailableAmountInCreditCard()) { //todo check
 						int money = c.getCustomer().getAvailableAmountInCreditCard().intValue();
-						System.out.println("money: " + money);
+//						System.out.println("money: " + money);
 						if (money-price>=0) {
 							Future<Boolean> fTake = sendEvent(new TakeEvent<>(c.getBookname()));
 							Boolean answer = fTake.get();

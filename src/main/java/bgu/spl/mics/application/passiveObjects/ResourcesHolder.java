@@ -18,7 +18,7 @@ import java.util.concurrent.Semaphore;
 public class ResourcesHolder {
 	private static ResourcesHolder instance = null;
 	private BlockingQueue<DeliveryVehicle> deliveryVehicles;
-	private BlockingQueue<Future<DeliveryVehicle>> futureNotResolves;
+	private BlockingQueue<Future<DeliveryVehicle>> futureNotResolved;
 	private Semaphore semaphore;
 
 	private static class SingletonHolder {
@@ -31,7 +31,7 @@ public class ResourcesHolder {
 
 	private ResourcesHolder() {
 		deliveryVehicles = new LinkedBlockingQueue<>();
-		futureNotResolves = new LinkedBlockingQueue<>();
+		futureNotResolved = new LinkedBlockingQueue<>();
 	}
 	/**
      * Retrieves the single instance of this class.
@@ -57,16 +57,11 @@ public class ResourcesHolder {
 	public Future<DeliveryVehicle> acquireVehicle() {
 		Future<DeliveryVehicle> f = new Future<>();
 		if (semaphore.tryAcquire()) {
-			DeliveryVehicle d = null;
-			try {
-				d = deliveryVehicles.take();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			DeliveryVehicle d = deliveryVehicles.remove();
 			f.resolve(d);
 		}
 		else {
-			futureNotResolves.add(f);
+			futureNotResolved.add(f);
 		}
 		return f;
 //		try {
@@ -90,15 +85,10 @@ public class ResourcesHolder {
      * @param vehicle	{@link DeliveryVehicle} to be released.
      */
 	public void releaseVehicle(DeliveryVehicle vehicle) {
-		synchronized (futureNotResolves) {
-			if (!futureNotResolves.isEmpty()) {
-				try {
-					Future<DeliveryVehicle> f = futureNotResolves.take();
-					f.resolve(vehicle);
-				}
-				catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+		synchronized (futureNotResolved) {
+			if (!futureNotResolved.isEmpty()) {
+				Future<DeliveryVehicle> f = futureNotResolved.remove();
+				f.resolve(vehicle);
 			}
 			else { // no future waiting
 				deliveryVehicles.add(vehicle);

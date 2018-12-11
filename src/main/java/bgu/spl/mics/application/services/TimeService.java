@@ -34,7 +34,7 @@ public class TimeService extends MicroService{
 		super(name);
 		this.duration=duration;
 		this.speed=speed;
-		this.currentTick = 1;
+		this.currentTick = 0;
 		this.numOfServices = numOfServices;
 		this.countInitialize = 0;
 	}
@@ -80,7 +80,7 @@ public class TimeService extends MicroService{
 		public void run() {
 			currentTick++;
 			System.out.println("curr: " + currentTick);
-			if (currentTick < duration) { //TODO CHECK EQUAL
+			if (currentTick <= duration) { //TODO CHECK EQUAL
 				sendBroadcast(new TickBroadcast(currentTick));
 			}
 			else {
