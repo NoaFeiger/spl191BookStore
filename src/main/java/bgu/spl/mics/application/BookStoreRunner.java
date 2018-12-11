@@ -143,11 +143,12 @@ public class BookStoreRunner {
         printMoneyRegister(MoneyRegister.getInstance(), args[4]);
         DeserializeHashMap(args[1]);
         DeserializeHashMap(args[2]);
-        printOrderReceipts(args[3]);
+        DeserializeOrderReceipts(args[3]);
+        DeserializeMoneyRegister(args[4]);
 
 
     }
-    private static void printOrderReceipts(String filename) {
+    private static void DeserializeOrderReceipts(String filename) {
         List list = new LinkedList();
         try {
             FileInputStream fis = new FileInputStream(filename);
@@ -168,7 +169,28 @@ public class BookStoreRunner {
             System.out.println(iterator.next());
         }
     }
+    private static void DeserializeMoneyRegister(String filename) {
+        MoneyRegister moneyRegister = MoneyRegister.getInstance();
+        try {
+            FileInputStream fis = new FileInputStream(filename);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            moneyRegister = (MoneyRegister) ois.readObject();
+            ois.close();
+        }
+        catch(IOException ioe)
+        {
+            System.out.println("NOT WRITING");
+            ioe.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
 
+//        Iterator iterator = list.iterator();
+//        while(iterator.hasNext()) {
+//            System.out.println(iterator.next());
+//        }
+        System.out.println(moneyRegister.getTotalEarnings());
+    }
     private static void printCustomersMap(HashMap customers, String filename) {
         try
         {

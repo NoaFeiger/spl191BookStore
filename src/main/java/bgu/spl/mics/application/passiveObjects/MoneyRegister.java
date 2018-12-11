@@ -39,16 +39,6 @@ public class MoneyRegister implements Serializable {
 	/**
      * Retrieves the single instance of this class.
      */
-//	public static MoneyRegister getInstance() {
-//		if(instance == null) {
-//			synchronized (MoneyRegister.class) {
-//				if(instance == null) {
-//					instance = new MoneyRegister();
-//				}
-//			}
-//		}
-//		return instance;
-//	}
 	
 	/**
      * Saves an order receipt in the money register.
@@ -58,9 +48,6 @@ public class MoneyRegister implements Serializable {
 	public void file (OrderReceipt r) {
 		orderReceipts.add(r);
 		totalEarnings.addAndGet(r.getPrice());
-//		synchronized (totalEarnings) {
-//			totalEarnings += r.getPrice();
-//		}
 	}
 	
 	/**

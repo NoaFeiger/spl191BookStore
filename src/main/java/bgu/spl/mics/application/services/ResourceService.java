@@ -3,6 +3,8 @@ package bgu.spl.mics.application.services;
 import bgu.spl.mics.*;
 import bgu.spl.mics.application.passiveObjects.*;
 
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -17,10 +19,10 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class ResourceService extends MicroService {
 	private ResourcesHolder resourcesHolder = ResourcesHolder.getInstance();
-	private BlockingQueue<Future<DeliveryVehicle>> futures;
+	private Queue<Future<DeliveryVehicle>> futures;
 	public ResourceService(String name) {
 		super(name);
-		futures = new LinkedBlockingQueue<>();
+		futures = new LinkedList<>();
 	}
 
 	@Override

@@ -1,4 +1,5 @@
 package bgu.spl.mics;
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -21,11 +22,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  * <p>
  */
 public abstract class MicroService implements Runnable {
-    private AtomicInteger tick;
     private boolean terminated;
     private final String name;
     private MessageBus mb;
-    private ConcurrentHashMap<Class<? extends Message>,Callback> callbacks;
+    private HashMap<Class<? extends Message>,Callback> callbacks; //todo check
 
     /**
      * @param name the micro-service name (used mainly for debugging purposes -
@@ -35,7 +35,7 @@ public abstract class MicroService implements Runnable {
         this.name = name;
         this.terminated=false;
         this.mb=MessageBusImpl.getInstance();
-        callbacks =new ConcurrentHashMap<>();
+        callbacks =new HashMap<>();
         //System.out.println("micro service "+this.name);
     }
 
@@ -158,16 +158,11 @@ public abstract class MicroService implements Runnable {
     @Override
     public final void run() {
         mb.register(this);
-//        System.out.println(getName());
         initialize();
-//        System.out.println("init");
         while (!terminated) {
            try {
-//               System.out.println("beforeawait");
                Message message=mb.awaitMessage(this);
-//               System.out.println("afterawait");
                Callback c= callbacks.get(message.getClass());
-//               System.out.println("inLoop"+this.name);
                if(c!=null) //TODO CHECK
                     c.call(message);
            }
@@ -176,9 +171,5 @@ public abstract class MicroService implements Runnable {
            }
         }
         mb.unregister(this);
-    }
-
-    private void setTick(AtomicInteger tick) {
-        this.tick = tick;
     }
 }

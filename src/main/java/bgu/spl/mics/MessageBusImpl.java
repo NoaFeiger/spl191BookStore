@@ -1,7 +1,9 @@
 package bgu.spl.mics;
 
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -12,8 +14,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class MessageBusImpl implements MessageBus {
 	private static MessageBusImpl instance = null;
 	private ConcurrentHashMap<MicroService, BlockingQueue<Message>> serviceQueueHashMap;
-	private ConcurrentHashMap<Class<? extends Event>, BlockingQueue<MicroService>> eventQueueHashMap_robin;
-	private ConcurrentHashMap<Class<? extends Broadcast>, BlockingQueue<MicroService>> broadcastQueueHashMap;
+	private ConcurrentHashMap<Class<? extends Event>, ConcurrentLinkedQueue<MicroService>> eventQueueHashMap_robin;
+	private ConcurrentHashMap<Class<? extends Broadcast>, ConcurrentLinkedQueue<MicroService>> broadcastQueueHashMap;
 	private ConcurrentHashMap<Event<?>, Future> eventFutureHashMap;
 
 	private MessageBusImpl() {
@@ -31,22 +33,12 @@ public class MessageBusImpl implements MessageBus {
 	public static MessageBusImpl getInstance() {
 		return SingletonHolder.instance;
 	}
-//	public static MessageBusImpl getInstance() {
-//		if(instance == null) {
-//			synchronized (MessageBusImpl.class) {
-//				if(instance == null) {
-//					instance = new MessageBusImpl();
-//				}
-//			}
-//		}
-//		return instance;
-//	}
 
 	@Override
 	public <T> void subscribeEvent(Class<? extends Event<T>> type, MicroService m) {
 		synchronized (type) {
 			if (!eventQueueHashMap_robin.containsKey(type)) {
-				eventQueueHashMap_robin.put(type, new LinkedBlockingQueue<>());
+				eventQueueHashMap_robin.put(type, new ConcurrentLinkedQueue<>());
 			}
 		}
 		eventQueueHashMap_robin.get(type).add(m);
@@ -56,7 +48,7 @@ public class MessageBusImpl implements MessageBus {
 	public void subscribeBroadcast(Class<? extends Broadcast> type, MicroService m) {
 		synchronized (type) {
 			if (!broadcastQueueHashMap.containsKey(type)) {
-				broadcastQueueHashMap.put(type, new LinkedBlockingQueue<>());
+				broadcastQueueHashMap.put(type, new ConcurrentLinkedQueue<>());
 			}
 		}
 		broadcastQueueHashMap.get(type).add(m);
@@ -84,25 +76,20 @@ public class MessageBusImpl implements MessageBus {
 	public <T> Future<T> sendEvent(Event<T> e) {
 		Future<T> f = new Future<>();
 		eventFutureHashMap.put(e,f);
-		BlockingQueue<MicroService> robin = eventQueueHashMap_robin.get(e.getClass());
-		if(robin==null) // event that no one register for him
-			return  null;
-		MicroService m;
-		synchronized (robin)
-		{
-			try {
-				m = robin.take();
-				serviceQueueHashMap.get(m).add(e);
-				robin.add(m);
-			}
-			catch (InterruptedException g){
-				System.out.println(g.getMessage());
-			}
+		ConcurrentLinkedQueue<MicroService> robin = eventQueueHashMap_robin.get(e.getClass());
+		if(robin==null) { // event that no one register for him
+			return null;
 		}
-//		synchronized (m)
-//		{
-//			m.notifyAll();
-//		}
+		MicroService m;
+		synchronized (robin) //todo check
+		{
+			if (robin.isEmpty()) {
+				return null;
+			}
+			m = robin.remove();
+			serviceQueueHashMap.get(m).add(e);
+			robin.add(m);
+		}
 		return f;
 	}
 
@@ -113,18 +100,17 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public void unregister(MicroService m) {
-		//m.terminate();
-		for ( BlockingQueue<MicroService> q : eventQueueHashMap_robin.values()){
+		for ( ConcurrentLinkedQueue<MicroService> q : eventQueueHashMap_robin.values()){
 //			synchronized(q) {
 				q.remove(m);
 //			}
 		}
-		for ( BlockingQueue<MicroService> q : broadcastQueueHashMap.values()){
+		for ( ConcurrentLinkedQueue<MicroService> q : broadcastQueueHashMap.values()){
 //			synchronized(q) {
 				q.remove(m);
 //			}
 		}
-		synchronized(serviceQueueHashMap.get(m)) {
+//		synchronized(serviceQueueHashMap.get(m)) {
 			for (Message mes : serviceQueueHashMap.get(m)) {
 				if (mes instanceof Event) {
 					eventFutureHashMap.get(mes).resolve(null);
@@ -136,20 +122,12 @@ public class MessageBusImpl implements MessageBus {
 				}
 			}
 			serviceQueueHashMap.remove(m);
-		}
+//		}
 
 	}
 
 	@Override
 	public Message awaitMessage(MicroService m) throws InterruptedException {
-	/*
-		synchronized (m) {
-
-			while (serviceQueueHashMap.get(m).isEmpty()) {
-				m.wait();
-			}
-		}
-		*/
 		BlockingQueue<Message> q= serviceQueueHashMap.get(m);
 		Message msg = q.take();
 		return msg;

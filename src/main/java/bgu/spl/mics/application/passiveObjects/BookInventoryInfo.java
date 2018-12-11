@@ -15,21 +15,17 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class BookInventoryInfo {
 
 	private String  bookTitle;
-	private AtomicInteger amountInInventory;
+	private int amountInInventory;
 	private int price;
-//	private ReadWriteLock rwLock;
-//	private Lock writeLock;
-//	private Lock readLock;
+	private Object lockAmountInInventory;
 	protected Semaphore semaphore;
 
 	public BookInventoryInfo(String bookTitle, int amountInInventory, int price)
 	{
-		this.amountInInventory = new AtomicInteger(amountInInventory);
+		this.amountInInventory = amountInInventory;
 		this.price=price;
 		this.bookTitle=bookTitle;
-//		rwLock = new ReentrantReadWriteLock();
-//		writeLock = rwLock.writeLock();
-//		readLock = rwLock.readLock();
+		lockAmountInInventory = new Object();
 		semaphore = new Semaphore(amountInInventory);
 	}
 
@@ -48,8 +44,8 @@ public class BookInventoryInfo {
      * @return amount of available books.      
      */
 	public int getAmountInInventory() {
-		synchronized (amountInInventory) {
-			return amountInInventory.intValue();
+		synchronized (lockAmountInInventory) {
+			return amountInInventory;
 		}
 	}
 
@@ -63,8 +59,8 @@ public class BookInventoryInfo {
 	}
 	
 	public void reduceAmount() {
-		synchronized (amountInInventory) {
-			amountInInventory.decrementAndGet();
+		synchronized (lockAmountInInventory) { //todo check
+			amountInInventory -= 1;
 		}
 	}
 }

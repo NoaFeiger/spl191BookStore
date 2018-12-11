@@ -13,7 +13,7 @@ import bgu.spl.mics.application.passiveObjects.*;
  * You MAY change constructor signatures and even add new public constructors.
  */
 public class LogisticsService extends MicroService {
-	private Integer amount;
+
 	public LogisticsService(String name) {
 		super(name);
 	}
@@ -27,7 +27,7 @@ public class LogisticsService extends MicroService {
 				Future<Future<DeliveryVehicle>>f_vehicle=sendEvent(new AcquireEvent<>());
 				DeliveryVehicle deliveryVehicle = f_vehicle.get().get();
 				deliveryVehicle.deliver(c.getAddress(),c.getDistance());
-				Future<Boolean> f_release=sendEvent(new ReleaseEvent<Boolean>(deliveryVehicle));
+				sendEvent(new ReleaseEvent<Boolean>(deliveryVehicle));
 
 			}
 		});

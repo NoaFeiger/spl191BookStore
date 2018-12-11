@@ -96,7 +96,6 @@ public class Customer implements Serializable {
 	public void chargeCreditCard(int amount) {
 		synchronized (availableAmountInCreditCard) {
 			availableAmountInCreditCard.addAndGet(-1*amount); //todo check
-//			System.out.println("avail: " + availableAmountInCreditCard);
 		}
 	}
 
@@ -110,7 +109,7 @@ public class Customer implements Serializable {
 		}
 	}
 
-	public void addReciept(OrderReceipt o) {
+	public void addReceipt(OrderReceipt o) {
 		Receipts.add(o);
 	}
 }

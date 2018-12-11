@@ -32,9 +32,7 @@ public class Future<T> {
 	public synchronized T get() {
 		while (!isDone()) {
 			try {
-				synchronized (this) {
-					this.wait();
-				}
+				this.wait();
 			}
 			catch (InterruptedException e){
 				System.out.println(e.getMessage());
@@ -46,7 +44,7 @@ public class Future<T> {
 	/**
      * Resolves the result of this Future object.
      */
-	public synchronized void resolve (T result) {
+	public synchronized void resolve (T result) { //todo check
 		this.result=result;
 		this.done=true;
 		notifyAll();
@@ -70,7 +68,7 @@ public class Future<T> {
      * 	       wait for {@code timeout} TimeUnits {@code unit}. If time has
      *         elapsed, return null.
      */
-	public T get(long timeout, TimeUnit unit) {
+	public synchronized T get(long timeout, TimeUnit unit) { //todo check
 		//Thread.sleep(unit.convert(timeout, unit));
 //		long timeoutExpiredMs = getSystem(unit, System.currentTimeMillis()) + getSystem(unit, timeout);
 //		while (!isDone()) {
@@ -97,9 +95,7 @@ public class Future<T> {
 				return null;
 			}
 			try {
-				synchronized (this) {
-					this.wait();
-				}
+				this.wait();
 			}
 			catch (InterruptedException e){
 				System.out.println(e.getMessage());

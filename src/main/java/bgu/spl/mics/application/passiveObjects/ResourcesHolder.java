@@ -2,7 +2,9 @@ package bgu.spl.mics.application.passiveObjects;
 
 import bgu.spl.mics.Future;
 
+import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 
@@ -17,8 +19,8 @@ import java.util.concurrent.Semaphore;
  */
 public class ResourcesHolder {
 	private static ResourcesHolder instance = null;
-	private BlockingQueue<DeliveryVehicle> deliveryVehicles;
-	private BlockingQueue<Future<DeliveryVehicle>> futureNotResolved;
+	private Queue<DeliveryVehicle> deliveryVehicles;
+	private Queue<Future<DeliveryVehicle>> futureNotResolved;
 	private Semaphore semaphore;
 
 	private static class SingletonHolder {
@@ -30,22 +32,12 @@ public class ResourcesHolder {
 	}
 
 	private ResourcesHolder() {
-		deliveryVehicles = new LinkedBlockingQueue<>();
-		futureNotResolved = new LinkedBlockingQueue<>();
+		deliveryVehicles = new ConcurrentLinkedQueue<>();
+		futureNotResolved = new ConcurrentLinkedQueue<>();
 	}
 	/**
      * Retrieves the single instance of this class.
      */
-//	public static ResourcesHolder getInstance() {
-//		if(instance == null) {
-//			synchronized (ResourcesHolder.class) {
-//				if(instance == null) {
-//					instance = new ResourcesHolder();
-//				}
-//			}
-//		}
-//		return instance;
-//	}
 	
 	/**
      * Tries to acquire a vehicle and gives a future object which will

@@ -60,10 +60,6 @@ public class TimeService extends MicroService{
 				terminate();
 			}
 		});
-
-//		countdownLatchWraper.await();
-//		this.timer = new Timer();
-//		timer.schedule(new sendBroadcastTask(), 100, speed);
 	}
 
 

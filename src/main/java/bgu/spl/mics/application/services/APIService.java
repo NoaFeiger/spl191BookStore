@@ -8,7 +8,6 @@ import bgu.spl.mics.application.passiveObjects.OrderSchedule;
 
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 
 /**
  * APIService is in charge of the connection between a client and the store.
@@ -24,6 +23,7 @@ public class APIService extends MicroService{
 	private Customer customer;
 	private LinkedList<OrderSchedule> orderSchedule;
 	private LinkedList<Future<OrderReceipt>> Futures;
+
 	public APIService() {
 		super("APIService");
 	}
@@ -59,7 +59,7 @@ public class APIService extends MicroService{
 					for (Future<OrderReceipt> f : Futures) {
 						OrderReceipt receipt = f.get();
 						if (receipt!=null) {
-							customer.addReciept(receipt);
+							customer.addReceipt(receipt);
 							sendEvent(new DeliveryEvent<Boolean>(customer.getDistance(), customer.getAddress()));
 						}
 					}
