@@ -1,9 +1,10 @@
 package bgu.spl.mics.application.passiveObjects;
 
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import com.sun.org.apache.xpath.internal.operations.Or;
+
+import java.io.*;
+import java.util.LinkedList;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -17,7 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * <p>
  * You can add ONLY private fields and methods to this class as you see fit.
  */
-public class MoneyRegister {
+public class MoneyRegister implements Serializable {
 	private static MoneyRegister instance = null;
 	private BlockingQueue<OrderReceipt> orderReceipts;
 	private AtomicInteger totalEarnings;
@@ -84,16 +85,20 @@ public class MoneyRegister {
      * This method is called by the main method in order to generate the output.
      */
 	public void printOrderReceipts(String filename) {
+		LinkedList<OrderReceipt> print = new LinkedList<>();
+		print.addAll(orderReceipts);
 		try
 		{
+			File f = new File(filename);
 			FileOutputStream fos =
-					new FileOutputStream(filename);
+					new FileOutputStream(f);
 			ObjectOutputStream oos = new ObjectOutputStream(fos);
-			oos.writeObject(orderReceipts);
+			oos.writeObject(print);
 			oos.close();
 			fos.close();
 		}catch(IOException ioe)
 		{
+			System.out.println("NOT WRITING");
 			ioe.printStackTrace();
 		}
 	}

@@ -1,7 +1,4 @@
 package bgu.spl.mics.application;
-import bgu.spl.mics.MessageBus;
-import bgu.spl.mics.MessageBusImpl;
-import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.passiveObjects.*;
 import bgu.spl.mics.application.services.*;
 import com.google.gson.*;
@@ -166,26 +163,45 @@ public class BookStoreRunner {
         printCustomersMap(CustomersMap, args[1]);
         Inventory.getInstance().printInventoryToFile(args[2]);
         MoneyRegister.getInstance().printOrderReceipts(args[3]);
-        DeserializeHashmMap(args[1]);
-        DeserializeConcurrentHashmMap(args[2]);
+//        DeserializeHashMap(args[1]);
+//        DeserializeConcurrentHashmMap(args[2]);
+        printMoneyRegister(MoneyRegister.getInstance(), args[4]);
 
     }
 
     private static void printCustomersMap(HashMap customers, String filename) {
         try
         {
+            File f = new File(filename);
             FileOutputStream fos =
-                    new FileOutputStream(filename);
+                    new FileOutputStream(f);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(customers);
             oos.close();
             fos.close();
         }catch(IOException ioe)
         {
+            System.out.println("NOT WRITING");
             ioe.printStackTrace();
         }
     }
-    private static void DeserializeHashmMap(String filename) {
+    private static void printMoneyRegister(MoneyRegister moneyRegister, String filename) {
+        try
+        {
+            File f = new File(filename);
+            FileOutputStream fos =
+                    new FileOutputStream(f);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(moneyRegister);
+            oos.close();
+            fos.close();
+        }catch(IOException ioe)
+        {
+            System.out.println("NOT WRITING");
+            ioe.printStackTrace();
+        }
+    }
+    private static void DeserializeHashMap(String filename) {
         HashMap map;
         try
         {

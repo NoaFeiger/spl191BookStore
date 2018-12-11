@@ -1,6 +1,7 @@
 package bgu.spl.mics.application.passiveObjects;
 
 import java.io.*;
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -17,7 +18,7 @@ public class Inventory {
 
 	private static Inventory instance = null;
 	private ConcurrentHashMap<String, BookInventoryInfo> books;
-	private ConcurrentHashMap<String, Integer> print;
+	private HashMap<String, Integer> print;
 
 	private static class SingletonHolder {
 		private static Inventory instance = new Inventory();
@@ -29,7 +30,7 @@ public class Inventory {
 
 	private Inventory() {
 		books = new ConcurrentHashMap<> ();
-		print = new ConcurrentHashMap<> ();
+		print = new HashMap<> ();
 	}
 
 	/**
@@ -114,14 +115,16 @@ public class Inventory {
 		}
 		try
 		{
+			File f = new File(filename);
 			FileOutputStream fos =
-					new FileOutputStream(filename);
+					new FileOutputStream(f);
 			ObjectOutputStream oos = new ObjectOutputStream(fos);
 			oos.writeObject(print);
 			oos.close();
 			fos.close();
 		}catch(IOException ioe)
 		{
+			System.out.println("NOT WRITING");
 			ioe.printStackTrace();
 		}
 	}
