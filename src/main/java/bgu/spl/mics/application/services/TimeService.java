@@ -26,6 +26,7 @@ public class TimeService extends MicroService{
 	private int currentTick;
 	private int numOfServices;
 	private int countInitialize;
+	private boolean ready;
 
 	public TimeService(long speed,int duration,String name, int numOfServices) {
 		super(name);
@@ -34,6 +35,7 @@ public class TimeService extends MicroService{
 		this.currentTick = 0;
 		this.numOfServices = numOfServices;
 		this.countInitialize = 0;
+		this.ready = false;
 	}
 
 	@Override
@@ -60,6 +62,10 @@ public class TimeService extends MicroService{
 				terminate();
 			}
 		});
+		synchronized (this) {
+			ready = true;
+			notifyAll();
+		}
 	}
 
 
@@ -82,5 +88,9 @@ public class TimeService extends MicroService{
 				timer.cancel();
 			}
 		}
+	}
+
+	public boolean getReady() {
+		return ready;
 	}
 }

@@ -117,11 +117,16 @@ public class BookStoreRunner {
         TimeService time_service=new TimeService(speed,duration,"time",countServices);
         Thread timeThread = new Thread(time_service);
         timeThread.start();
-        try {
-            Thread.sleep(1000); //todo check
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        synchronized (time_service) {
+            while (!time_service.getReady()) {
+                try {
+                   time_service.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
+
         for (Thread thread : servicesToRun) {
             thread.start();
         }

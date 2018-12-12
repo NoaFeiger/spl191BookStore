@@ -78,15 +78,21 @@ public class MessageBusImpl implements MessageBus {
 		eventFutureHashMap.put(e,f);
 		ConcurrentLinkedQueue<MicroService> robin = eventQueueHashMap_robin.get(e.getClass());
 		if(robin==null) { // event that no one register for him
-			return null;
+			complete(e, null);
+			return f;
 		}
 		MicroService m;
 		synchronized (robin) //todo check
 		{
 			if (robin.isEmpty()) {
-				return null;
+				complete(e, null);
+				return f;
 			}
 			m = robin.remove();
+			if (serviceQueueHashMap.get(m)==null) {
+				complete(e, null);
+				return f;
+			}
 			serviceQueueHashMap.get(m).add(e);
 			robin.add(m);
 		}
@@ -101,16 +107,16 @@ public class MessageBusImpl implements MessageBus {
 	@Override
 	public void unregister(MicroService m) {
 		for ( ConcurrentLinkedQueue<MicroService> q : eventQueueHashMap_robin.values()){
-//			synchronized(q) {
+			synchronized(q) {
 				q.remove(m);
-//			}
+			}
 		}
 		for ( ConcurrentLinkedQueue<MicroService> q : broadcastQueueHashMap.values()){
-//			synchronized(q) {
+			synchronized(q) {
 				q.remove(m);
-//			}
+			}
 		}
-//		synchronized(serviceQueueHashMap.get(m)) {
+		synchronized (serviceQueueHashMap.get(m)) {
 			for (Message mes : serviceQueueHashMap.get(m)) {
 				if (mes instanceof Event) {
 					eventFutureHashMap.get(mes).resolve(null);
@@ -122,8 +128,7 @@ public class MessageBusImpl implements MessageBus {
 				}
 			}
 			serviceQueueHashMap.remove(m);
-//		}
-
+		}
 	}
 
 	@Override

@@ -1,15 +1,10 @@
 package bgu.spl.mics.application.passiveObjects;
 
-import com.google.gson.JsonArray;
-
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 
 /**
  * Passive data-object representing a customer of the store.
@@ -35,7 +30,7 @@ public class Customer implements Serializable {
 		this.creditCard = creditCard;
 		this.availableAmountInCreditCard = new AtomicInteger(availableAmountInCreditCard);
 		this.orders = orders;
-		Receipts = new LinkedList<>();
+		this.Receipts = new LinkedList<>();
 	}
 	/**
      * Retrieves the name of the customer.

@@ -1,10 +1,6 @@
 package bgu.spl.mics.application.passiveObjects;
 
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Passive data-object representing a information about a certain book in the inventory.

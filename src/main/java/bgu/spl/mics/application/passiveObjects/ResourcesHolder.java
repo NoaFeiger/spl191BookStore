@@ -48,26 +48,16 @@ public class ResourcesHolder {
      */
 	public Future<DeliveryVehicle> acquireVehicle() {
 		Future<DeliveryVehicle> f = new Future<>();
-		if (semaphore.tryAcquire()) {
-			DeliveryVehicle d = deliveryVehicles.remove();
-			f.resolve(d);
+		synchronized (futureNotResolved) {
+			if (semaphore.tryAcquire()) {
+				DeliveryVehicle d = deliveryVehicles.remove();
+				f.resolve(d);
+			}
+			else {
+				futureNotResolved.add(f);
+			}
+			return f;
 		}
-		else {
-			futureNotResolved.add(f);
-		}
-		return f;
-//		try {
-//			semaphore.acquire();
-//			try {
-//
-//			}
-//			catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-
 	}
 	
 	/**

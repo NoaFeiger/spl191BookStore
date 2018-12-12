@@ -69,24 +69,6 @@ public class Future<T> {
      *         elapsed, return null.
      */
 	public synchronized T get(long timeout, TimeUnit unit) { //todo check
-		//Thread.sleep(unit.convert(timeout, unit));
-//		long timeoutExpiredMs = getSystem(unit, System.currentTimeMillis()) + getSystem(unit, timeout);
-//		while (!isDone()) {
-//			long waitMs = timeoutExpiredMs - getSystem(unit, System.currentTimeMillis());
-//			if (waitMs <= 0) {
-//				// timeout expired
-//				return null;
-//			}
-//			try {
-//				synchronized (this) {
-//					this.wait();
-//				}
-//			}
-//			catch (InterruptedException e){
-//				System.out.println(e.getMessage());
-//			}
-//		}
-//		return result;
 		long timeoutExpiredMs = System.currentTimeMillis() + TimeUnit.MILLISECONDS.convert(timeout, unit);
 		while (!isDone()) {
 			long waitMs = timeoutExpiredMs - System.currentTimeMillis();
@@ -102,30 +84,5 @@ public class Future<T> {
 			}
 		}
 		return result;
-	}
-
-	private long getSystem(TimeUnit unit, long time) {
-		long system = 0;
-		if (unit.equals(TimeUnit.DAYS))
-			system = TimeUnit.MILLISECONDS.toDays(time);
-		else if (unit.equals(TimeUnit.HOURS)) {
-			system = TimeUnit.MILLISECONDS.toHours(time);
-		}
-		else if (unit.equals(TimeUnit.MICROSECONDS)) {
-			system = TimeUnit.MILLISECONDS.toMicros(time);
-		}
-		else if (unit.equals(TimeUnit.MILLISECONDS)) {
-			system = time;
-		}
-		else if (unit.equals(TimeUnit.MINUTES)) {
-			system = TimeUnit.MILLISECONDS.toMinutes(time);
-		}
-		else if (unit.equals(TimeUnit.NANOSECONDS)) {
-			system = TimeUnit.MILLISECONDS.toNanos(time);
-		}
-		else if (unit.equals(TimeUnit.SECONDS)) {
-			system = TimeUnit.MILLISECONDS.toSeconds(time);
-		}
-		return system;
 	}
 }
