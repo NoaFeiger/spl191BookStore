@@ -91,9 +91,10 @@ public class MessageBusImpl implements MessageBus {
 			m = robin.remove();
 			if (serviceQueueHashMap.get(m)==null) {
 				complete(e, null);
-				return f;
 			}
-			serviceQueueHashMap.get(m).add(e);
+			else {
+				serviceQueueHashMap.get(m).add(e);
+			}
 			robin.add(m);
 		}
 		return f;
