@@ -26,7 +26,7 @@ public class SellingService extends MicroService{
 		subscribeEvent(BookOrderEvent.class, new Callback<BookOrderEvent>() {
 			@Override
 			public void call(BookOrderEvent c) {
-				Future<Integer> fProccessTick = sendEvent(new TimeRequestEvent<Integer>());
+				Future<Integer> fProccessTick = sendEvent(new TimeRequestEvent<>());
 				if (fProccessTick==null) {
 					complete(c, null);
 					return;
@@ -73,6 +73,14 @@ public class SellingService extends MicroService{
 					else {
 						complete(c, null);
 					}
+				}
+			}
+
+			private void checkFuture(Future f, BookOrderEvent c) {
+				if (f==null) {
+					complete(c, null);
+					System.out.println("returning");
+					return;
 				}
 			}
 		});
