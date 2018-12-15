@@ -41,6 +41,9 @@ public class DeliveryVehicle {
      * @param distance	The distance from the store to the customer.
      */
 	public void deliver(String address, int distance) {
-		try {Thread.sleep(distance*getSpeed());} catch (InterruptedException e) {}
+		try {
+			System.out.println("sleeping " +distance*getSpeed());
+			Thread.sleep(distance*getSpeed());
+		} catch (InterruptedException e) {}
 	}
 }

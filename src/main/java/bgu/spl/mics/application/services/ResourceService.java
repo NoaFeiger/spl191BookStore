@@ -46,7 +46,7 @@ public class ResourceService extends MicroService {
 			@Override
 			public void call(TerminateBroadcast c) {
 				for (Future<DeliveryVehicle> f : futures) {
-					if (!f.isDone()) {
+					if (!f.isDone() ) {
 						f.resolve(null);
 					}
 				}

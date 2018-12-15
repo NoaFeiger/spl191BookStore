@@ -142,14 +142,14 @@ public class BookStoreRunner {
                 e.printStackTrace();
             }
         }
-        printCustomersMap(CustomersMap, args[1]);
-        Inventory.getInstance().printInventoryToFile(args[2]);
-        MoneyRegister.getInstance().printOrderReceipts(args[3]);
-        printMoneyRegister(MoneyRegister.getInstance(), args[4]);
-        DeserializeHashMap(args[1]);
-        DeserializeHashMap(args[2]);
-        DeserializeOrderReceipts(args[3]);
-        DeserializeMoneyRegister(args[4]);
+//        printCustomersMap(CustomersMap, args[1]);
+//        Inventory.getInstance().printInventoryToFile(args[2]);
+//        MoneyRegister.getInstance().printOrderReceipts(args[3]);
+//        printMoneyRegister(MoneyRegister.getInstance(), args[4]);
+//        DeserializeHashMap(args[1]);
+//        DeserializeHashMap(args[2]);
+//        DeserializeOrderReceipts(args[3]);
+//        DeserializeMoneyRegister(args[4]);
 
 
     }
@@ -175,7 +175,7 @@ public class BookStoreRunner {
         }
     }
     private static void DeserializeMoneyRegister(String filename) {
-        MoneyRegister moneyRegister = MoneyRegister.getInstance();
+        MoneyRegister moneyRegister = null;
         try {
             FileInputStream fis = new FileInputStream(filename);
             ObjectInputStream ois = new ObjectInputStream(fis);
