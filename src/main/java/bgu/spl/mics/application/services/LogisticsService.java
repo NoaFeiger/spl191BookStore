@@ -26,15 +26,15 @@ public class LogisticsService extends MicroService {
 			public void call(DeliveryEvent c) {
 				Future<Future<DeliveryVehicle>>f_vehicle=sendEvent(new AcquireEvent<>());
 				System.out.println("after send ");
-				DeliveryVehicle deliveryVehicle = f_vehicle.get().get();
-				System.out.println("get car ");
-				if (deliveryVehicle!=null) {
-					deliveryVehicle.deliver(c.getAddress(),c.getDistance());
-
+				if (f_vehicle.get()!=null) {
+					DeliveryVehicle deliveryVehicle = f_vehicle.get().get();
+					System.out.println("get car ");
+					if (deliveryVehicle!=null) {
+						System.out.println("sending release ");
+						deliveryVehicle.deliver(c.getAddress(),c.getDistance());
+						sendEvent(new ReleaseEvent<Boolean>(deliveryVehicle));
+					}
 				}
-				System.out.println("sending release ");
-
-				sendEvent(new ReleaseEvent<Boolean>(deliveryVehicle));
 			}
 		});
 		subscribeBroadcast(TerminateBroadcast.class, new Callback<TerminateBroadcast>() {
