@@ -36,7 +36,6 @@ public abstract class MicroService implements Runnable {
         this.terminated=false;
         this.mb=MessageBusImpl.getInstance();
         callbacks =new HashMap<>();
-        //System.out.println("micro service "+this.name);
     }
 
     /**
@@ -164,12 +163,10 @@ public abstract class MicroService implements Runnable {
                Message message=mb.awaitMessage(this);
                Callback c= callbacks.get(message.getClass());
                if(c!=null) {
-//                   System.out.println(c.toString());
                    c.call(message); //TODO CHECK
                }
            }
            catch (InterruptedException e){
-               System.out.print(e.getMessage());
            }
         }
         mb.unregister(this);

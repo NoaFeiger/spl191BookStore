@@ -36,18 +36,6 @@ public class Inventory {
 	/**
      * Retrieves the single instance of this class.
      */
-
-//	public static Inventory getInstance() {
-//		if(instance == null) {
-//			synchronized (Inventory.class) {
-//				if(instance == null) {
-//					instance = new Inventory();
-//				}
-//			}
-//		}
-//		return instance;
-//	}
-	
 	/**
      * Initializes the store inventory. This method adds all the items given to the store
      * inventory.
@@ -73,11 +61,8 @@ public class Inventory {
      */
 	public OrderResult take (String book) {
 		if (books.get(book).semaphore.tryAcquire()) {
-//			if (checkAvailabiltyAndGetPrice(book)!=-1) {
 			books.get(book).reduceAmount();
 			return OrderResult.SUCCESSFULLY_TAKEN;
-//			}
-//			return OrderResult.NOT_IN_STOCK;
 		}
 		return OrderResult.NOT_IN_STOCK;
 	}
@@ -123,12 +108,7 @@ public class Inventory {
 			fos.close();
 		}catch(IOException ioe)
 		{
-			System.out.println("NOT WRITING");
 			ioe.printStackTrace();
 		}
-	}
-
-	private ConcurrentHashMap getHashMap() {
-		return books;
 	}
 }

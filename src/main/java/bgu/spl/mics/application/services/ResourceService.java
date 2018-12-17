@@ -5,9 +5,6 @@ import bgu.spl.mics.application.passiveObjects.*;
 
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-
 /**
  * ResourceService is in charge of the store resources - the delivery vehicles.
  * Holds a reference to the {@link ResourcesHolder} singleton of the store.

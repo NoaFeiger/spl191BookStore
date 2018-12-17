@@ -29,13 +29,14 @@ public class Future<T> {
      * @return return the result of type T if it is available, if not wait until it is available.
      * 	       
      */
+
+	//sync- wait needs to be in a sync method
 	public synchronized T get() {
 		while (!isDone()) {
 			try {
 				this.wait();
 			}
 			catch (InterruptedException e){
-				System.out.println(e.getMessage());
 			}
 		}
 		return result;
@@ -44,6 +45,8 @@ public class Future<T> {
 	/**
      * Resolves the result of this Future object.
      */
+
+	//sync- notifyAll needs to be in a sync method
 	public synchronized void resolve (T result) { //todo check
 		this.result=result;
 		this.done=true;
@@ -68,6 +71,8 @@ public class Future<T> {
      * 	       wait for {@code timeout} TimeUnits {@code unit}. If time has
      *         elapsed, return null.
      */
+
+	//sync- wait needs to be in a sync method
 	public synchronized T get(long timeout, TimeUnit unit) { //todo check
 		long timeoutExpiredMs = System.currentTimeMillis() + TimeUnit.MILLISECONDS.convert(timeout, unit);
 		while (!isDone()) {
@@ -80,7 +85,6 @@ public class Future<T> {
 				this.wait();
 			}
 			catch (InterruptedException e){
-				System.out.println(e.getMessage());
 			}
 		}
 		return result;

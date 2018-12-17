@@ -23,7 +23,6 @@ public class MessageBusImpl implements MessageBus {
 		eventFutureHashMap = new ConcurrentHashMap<>();
 		eventQueueHashMap_robin = new ConcurrentHashMap<>();
 		broadcastQueueHashMap = new ConcurrentHashMap<>();
-		//System.out.println("messagebus ");
 	}
 
 	private static class SingletonHolder {
@@ -36,6 +35,7 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public <T> void subscribeEvent(Class<? extends Event<T>> type, MicroService m) {
+		// so there wont be the same type in the queue
 		synchronized (type) {
 			if (!eventQueueHashMap_robin.containsKey(type)) {
 				eventQueueHashMap_robin.put(type, new ConcurrentLinkedQueue<>());
@@ -46,6 +46,7 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public void subscribeBroadcast(Class<? extends Broadcast> type, MicroService m) {
+		// so there wont be the same type in the queue
 		synchronized (type) {
 			if (!broadcastQueueHashMap.containsKey(type)) {
 				broadcastQueueHashMap.put(type, new ConcurrentLinkedQueue<>());
@@ -65,6 +66,7 @@ public class MessageBusImpl implements MessageBus {
 			return;
 		}
 		for ( MicroService m : broadcastQueueHashMap.get(b.getClass())){
+			// the queue of the service is synced across the program
 			synchronized(serviceQueueHashMap.get(m)) {  // TODO CHECK IF SYNCHRONIZED IS NEEDED
 				serviceQueueHashMap.get(m).add(b);
 			}
@@ -82,6 +84,7 @@ public class MessageBusImpl implements MessageBus {
 			return f;
 		}
 		MicroService m;
+		// needed to make sure the queue is removed and then added in the end
 		synchronized (robin) //todo check
 		{
 			if (robin.isEmpty()) {
@@ -89,11 +92,14 @@ public class MessageBusImpl implements MessageBus {
 				return f;
 			}
 			m = robin.remove();
-			if (serviceQueueHashMap.get(m)==null) {
-				complete(e, null);
-			}
-			else {
-				serviceQueueHashMap.get(m).add(e);
+			// avoid getting a null queue
+			synchronized (serviceQueueHashMap.get(m)) {
+				if (serviceQueueHashMap.get(m)==null) {
+					complete(e, null);
+				}
+				else {
+					serviceQueueHashMap.get(m).add(e);
+				}
 			}
 			robin.add(m);
 		}
@@ -108,24 +114,23 @@ public class MessageBusImpl implements MessageBus {
 	@Override
 	public void unregister(MicroService m) {
 		for ( ConcurrentLinkedQueue<MicroService> q : eventQueueHashMap_robin.values()){
+			// so a new event wont be added
 			synchronized(q) {
 				q.remove(m);
 			}
 		}
 		for ( ConcurrentLinkedQueue<MicroService> q : broadcastQueueHashMap.values()){
+			// so a new broadcast wont be added
 			synchronized(q) {
 				q.remove(m);
 			}
 		}
+
+		//
 		synchronized (serviceQueueHashMap.get(m)) {
 			for (Message mes : serviceQueueHashMap.get(m)) {
 				if (mes instanceof Event) {
 					eventFutureHashMap.get(mes).resolve(null);
-				}
-				try {
-					serviceQueueHashMap.get(m).take();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
 				}
 			}
 			serviceQueueHashMap.remove(m);

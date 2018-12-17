@@ -25,12 +25,9 @@ public class LogisticsService extends MicroService {
 			@Override
 			public void call(DeliveryEvent c) {
 				Future<Future<DeliveryVehicle>>f_vehicle=sendEvent(new AcquireEvent<>());
-				System.out.println("after send ");
 				if (f_vehicle.get()!=null) {
 					DeliveryVehicle deliveryVehicle = f_vehicle.get().get();
-					System.out.println("get car ");
 					if (deliveryVehicle!=null) {
-						System.out.println("sending release ");
 						deliveryVehicle.deliver(c.getAddress(),c.getDistance());
 						sendEvent(new ReleaseEvent<Boolean>(deliveryVehicle));
 					}

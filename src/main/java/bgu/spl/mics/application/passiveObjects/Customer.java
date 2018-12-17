@@ -99,9 +99,7 @@ public class Customer implements Serializable {
 	}
 
 	public AtomicInteger getAvailableAmountInCreditCard() {
-		synchronized (availableAmountInCreditCard) {
-			return availableAmountInCreditCard;
-		}
+		return availableAmountInCreditCard;
 	}
 
 	public void addReceipt(OrderReceipt o) {

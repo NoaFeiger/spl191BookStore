@@ -19,8 +19,6 @@ public class ExampleManager {
         Scanner sc = new Scanner(System.in);
         boolean quit = false;
         try {
-            System.out.println("Example manager is started - supported commands are: start,quit");
-            System.out.println("Supporting services: " + serviceCreators.keySet());
             while (!quit) {
 
                 String line = sc.nextLine();

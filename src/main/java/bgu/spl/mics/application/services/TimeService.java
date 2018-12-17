@@ -50,7 +50,6 @@ public class TimeService extends MicroService{
             @Override
             public void call(FinishInitializeBroadcast c) {
                 countInitialize++;
-                System.out.println("count:" + countInitialize);
                 if (countInitialize==numOfServices) {
                     TimerStart();
                 }
@@ -62,6 +61,9 @@ public class TimeService extends MicroService{
 				terminate();
 			}
 		});
+
+		//notifyAll needs to be in a sync method, notify to the main that time service finish
+		// initialization so all of the services can begin running
 		synchronized (this) {
 			ready = true;
 			notifyAll();
@@ -78,8 +80,7 @@ public class TimeService extends MicroService{
 		@Override
 		public void run() {
 			currentTick++;
-			System.out.println("curr: " + currentTick);
-			if (currentTick <= duration) { //TODO CHECK EQUAL
+			if (currentTick < duration) { //TODO CHECK EQUAL
 				sendBroadcast(new TickBroadcast(currentTick));
 			}
 			else {

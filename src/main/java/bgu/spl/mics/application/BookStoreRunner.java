@@ -4,7 +4,6 @@ import bgu.spl.mics.application.services.*;
 import com.google.gson.*;
 
 import java.io.*;
-import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -14,14 +13,18 @@ import java.util.concurrent.ConcurrentHashMap;
  * In the end, you should output serialized objects.
  */
 public class BookStoreRunner {
-    public static void main(String[] args) throws FileNotFoundException, ParseException { //TODO CHECK EXCEPTION
-        // todo check if including timeservice
+    public static void main(String[] args) {
         int countServices = 0;
         // receive file name from the user
         String fileName = args[0];
         // read json file
 
-        FileReader reader = new FileReader(fileName);
+        FileReader reader = null;
+        try {
+            reader = new FileReader(fileName);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         JsonParser parser = new JsonParser();
         JsonObject jo = (JsonObject) parser.parse(reader);
         //
@@ -117,6 +120,8 @@ public class BookStoreRunner {
         TimeService time_service=new TimeService(speed,duration,"time",countServices);
         Thread timeThread = new Thread(time_service);
         timeThread.start();
+
+        //sync- wait needs to be in a sync method
         synchronized (time_service) {
             while (!time_service.getReady()) {
                 try {
@@ -142,89 +147,28 @@ public class BookStoreRunner {
                 e.printStackTrace();
             }
         }
-        printCustomersMap(CustomersMap, args[1]);
+        printObject(CustomersMap, args[1]);
         Inventory.getInstance().printInventoryToFile(args[2]);
         MoneyRegister.getInstance().printOrderReceipts(args[3]);
-        printMoneyRegister(MoneyRegister.getInstance(), args[4]);
-        DeserializeHashMap(args[1]);
-        DeserializeHashMap(args[2]);
-        DeserializeOrderReceipts(args[3]);
-        DeserializeMoneyRegister(args[4]);
-
-
+        printObject(MoneyRegister.getInstance(), args[4]);
+//        DeserializeHashMap(args[1]);
+//        DeserializeHashMap(args[2]);
+//        DeserializeOrderReceipts(args[3]);
+//        DeserializeMoneyRegister(args[4]);
     }
-    private static void DeserializeOrderReceipts(String filename) {
-        List list = new LinkedList();
-        try {
-            FileInputStream fis = new FileInputStream(filename);
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            list = (List) ois.readObject();
-            ois.close();
-        }
-        catch(IOException ioe)
-        {
-            System.out.println("NOT WRITING");
-            ioe.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
 
-        Iterator iterator = list.iterator();
-        while(iterator.hasNext()) {
-            System.out.println(iterator.next());
-        }
-    }
-    private static void DeserializeMoneyRegister(String filename) {
-        MoneyRegister moneyRegister = null;
-        try {
-            FileInputStream fis = new FileInputStream(filename);
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            moneyRegister = (MoneyRegister) ois.readObject();
-            ois.close();
-        }
-        catch(IOException ioe)
-        {
-            System.out.println("NOT WRITING");
-            ioe.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-//        Iterator iterator = list.iterator();
-//        while(iterator.hasNext()) {
-//            System.out.println(iterator.next());
-//        }
-        System.out.println(moneyRegister.getTotalEarnings());
-    }
-    private static void printCustomersMap(HashMap customers, String filename) {
+    private static void printObject(Object object, String filename) {
         try
         {
             File f = new File(filename);
             FileOutputStream fos =
                     new FileOutputStream(f);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(customers);
+            oos.writeObject(object);
             oos.close();
             fos.close();
         }catch(IOException ioe)
         {
-            System.out.println("NOT WRITING");
-            ioe.printStackTrace();
-        }
-    }
-    private static void printMoneyRegister(MoneyRegister moneyRegister, String filename) {
-        try
-        {
-            File f = new File(filename);
-            FileOutputStream fos =
-                    new FileOutputStream(f);
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(moneyRegister);
-            oos.close();
-            fos.close();
-        }catch(IOException ioe)
-        {
-            System.out.println("NOT WRITING");
             ioe.printStackTrace();
         }
     }
@@ -285,5 +229,42 @@ public class BookStoreRunner {
             System.out.print("key: "+ mentry.getKey() + " & Value: ");
             System.out.println(mentry.getValue());
         }
+    }
+    private static void DeserializeOrderReceipts(String filename) {
+        List list = new LinkedList();
+        try {
+            FileInputStream fis = new FileInputStream(filename);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            list = (List) ois.readObject();
+            ois.close();
+        }
+        catch(IOException ioe)
+        {
+            ioe.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        Iterator iterator = list.iterator();
+        while(iterator.hasNext()) {
+            System.out.println(iterator.next());
+        }
+    }
+    private static void DeserializeMoneyRegister(String filename) {
+        MoneyRegister moneyRegister = null;
+        try {
+            FileInputStream fis = new FileInputStream(filename);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            moneyRegister = (MoneyRegister) ois.readObject();
+            ois.close();
+        }
+        catch(IOException ioe)
+        {
+            System.out.println("NOT WRITING");
+            ioe.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        System.out.println(moneyRegister.getTotalEarnings());
     }
 }

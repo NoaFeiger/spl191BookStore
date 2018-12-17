@@ -5,8 +5,7 @@ import com.sun.org.apache.xpath.internal.operations.Or;
 
 import java.io.*;
 import java.util.LinkedList;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -20,7 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class MoneyRegister implements Serializable {
 	private static MoneyRegister instance = null;
-	private BlockingQueue<OrderReceipt> orderReceipts;
+	private ConcurrentLinkedQueue<OrderReceipt> orderReceipts;
 	private AtomicInteger totalEarnings;
 
 	private static class SingletonHolder {
@@ -32,7 +31,7 @@ public class MoneyRegister implements Serializable {
 	}
 
 	private MoneyRegister() {
-		orderReceipts = new LinkedBlockingQueue<>();
+		orderReceipts = new ConcurrentLinkedQueue<>();
 		totalEarnings = new AtomicInteger(0);
 	}
 
@@ -85,7 +84,6 @@ public class MoneyRegister implements Serializable {
 			fos.close();
 		}catch(IOException ioe)
 		{
-			System.out.println("NOT WRITING");
 			ioe.printStackTrace();
 		}
 	}

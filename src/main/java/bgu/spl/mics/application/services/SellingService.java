@@ -42,7 +42,9 @@ public class SellingService extends MicroService{
 					complete(c, null);
 					return;
 				}
-				synchronized (c.getCustomer().getAvailableAmountInCreditCard()) { //todo check
+
+				//sync because there is no possibility to change the money of the customer while we take book
+				synchronized (c.getCustomer().getAvailableAmountInCreditCard()) {
 					int money = c.getCustomer().getAvailableAmountInCreditCard().intValue();
 					if (money-price>=0) {
 						Future<Boolean> fTake = sendEvent(new TakeEvent<>(c.getBookname()));
@@ -75,15 +77,8 @@ public class SellingService extends MicroService{
 					}
 				}
 			}
-
-			private void checkFuture(Future f, BookOrderEvent c) {
-				if (f==null) {
-					complete(c, null);
-					System.out.println("returning");
-					return;
-				}
-			}
 		});
+
 		subscribeBroadcast(TerminateBroadcast.class, new Callback<TerminateBroadcast>() {
 			@Override
 			public void call(TerminateBroadcast c) {

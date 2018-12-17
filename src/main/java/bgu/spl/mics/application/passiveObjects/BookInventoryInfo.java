@@ -1,6 +1,7 @@
 package bgu.spl.mics.application.passiveObjects;
 
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Passive data-object representing a information about a certain book in the inventory.
@@ -11,17 +12,15 @@ import java.util.concurrent.Semaphore;
 public class BookInventoryInfo {
 
 	private String  bookTitle;
-	private int amountInInventory;
+	private AtomicInteger amountInInventory;
 	private int price;
-	private Object lockAmountInInventory;
 	protected Semaphore semaphore;
 
 	public BookInventoryInfo(String bookTitle, int amountInInventory, int price)
 	{
-		this.amountInInventory = amountInInventory;
+		this.amountInInventory = new AtomicInteger(amountInInventory);
 		this.price=price;
 		this.bookTitle=bookTitle;
-		lockAmountInInventory = new Object();
 		semaphore = new Semaphore(amountInInventory);
 	}
 
@@ -40,9 +39,8 @@ public class BookInventoryInfo {
      * @return amount of available books.      
      */
 	public int getAmountInInventory() {
-		synchronized (lockAmountInInventory) {
-			return amountInInventory;
-		}
+		return amountInInventory.intValue();
+
 	}
 
 	/**
@@ -55,8 +53,6 @@ public class BookInventoryInfo {
 	}
 	
 	public void reduceAmount() {
-		synchronized (lockAmountInInventory) { //todo check
-			amountInInventory -= 1;
-		}
+			amountInInventory.decrementAndGet();
 	}
 }

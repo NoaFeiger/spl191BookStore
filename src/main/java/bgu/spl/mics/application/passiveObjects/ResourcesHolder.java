@@ -3,9 +3,7 @@ package bgu.spl.mics.application.passiveObjects;
 import bgu.spl.mics.Future;
 
 import java.util.Queue;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 
 /**
@@ -48,13 +46,9 @@ public class ResourcesHolder {
      */
 	public Future<DeliveryVehicle> acquireVehicle() {
 		Future<DeliveryVehicle> f = new Future<>();
-		System.out.println("size before acq: " + deliveryVehicles.size());
 		synchronized (futureNotResolved) {
 			if (semaphore.tryAcquire()) {
 				DeliveryVehicle d = deliveryVehicles.remove();
-
-				System.out.println(d==null);
-
 				f.resolve(d);
 			}
 			else {
@@ -81,7 +75,6 @@ public class ResourcesHolder {
 				semaphore.release();
 			}
 		}
-		System.out.println("size after res: " + deliveryVehicles.size());
 	}
 	
 	/**
