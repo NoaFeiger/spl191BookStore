@@ -37,41 +37,33 @@ public class APIService extends MicroService{
 		for (int i = 0; i < orderSchedule.size(); i++) {
 			int tick = orderSchedule.get(i).getTick();
 			if (!TickBooksHashmap.containsKey(tick)) {
-				TickBooksHashmap.put(tick, new LinkedList<String>());
+				TickBooksHashmap.put(tick, new LinkedList<>());
 			}
-			TickBooksHashmap.get(tick).add(orderSchedule.get(i).getBook_name());
+			TickBooksHashmap.get(tick).add(orderSchedule.get(i).getBookName());
 		}
 	}
 
 	@Override
 	protected void initialize() {
-		subscribeBroadcast(TickBroadcast.class, new Callback<TickBroadcast>() {
-			@Override
-			public void call(TickBroadcast c) {
-				int tick = c.getTick().intValue();
-				if (TickBooksHashmap.containsKey(tick)) {
-					LinkedList<String> books = TickBooksHashmap.get(tick);
-					for (String bookname : books) {
-						Future<OrderReceipt> fOrder =
-								sendEvent(new BookOrderEvent<OrderReceipt>(customer,bookname,tick));
-						Futures.add(fOrder);
-					}
-					for (Future<OrderReceipt> f : Futures) {
-						OrderReceipt receipt = f.get();
-						if (receipt!=null) {
-							customer.addReceipt(receipt);
-							sendEvent(new DeliveryEvent<Boolean>(customer.getDistance(), customer.getAddress()));
-						}
+		subscribeBroadcast(TickBroadcast.class, c -> {
+			int tick = c.getTick().intValue();
+			if (TickBooksHashmap.containsKey(tick)) {
+				LinkedList<String> books = TickBooksHashmap.get(tick);
+				for (String bookname : books) {
+					Future<OrderReceipt> fOrder =
+							sendEvent(new BookOrderEvent<>(customer, bookname, tick));
+					Futures.add(fOrder);
+				}
+				for (Future<OrderReceipt> f : Futures) {
+					OrderReceipt receipt = f.get();
+					if (receipt!=null) {
+						customer.addReceipt(receipt);
+						sendEvent(new DeliveryEvent<Boolean>(customer.getDistance(), customer.getAddress()));
 					}
 				}
 			}
 		});
-		subscribeBroadcast(TerminateBroadcast.class, new Callback<TerminateBroadcast>() {
-			@Override
-			public void call(TerminateBroadcast c) {
-			    terminate();
-			}
-		});
+		subscribeBroadcast(TerminateBroadcast.class, c -> terminate());
 		sendBroadcast( new FinishInitializeBroadcast());
 	}
 

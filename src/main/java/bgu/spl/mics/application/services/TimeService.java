@@ -40,27 +40,14 @@ public class TimeService extends MicroService{
 
 	@Override
 	protected void initialize() {
-		subscribeEvent(TimeRequestEvent.class, new Callback<TimeRequestEvent>() {
-			@Override
-			public void call(TimeRequestEvent c) {
-				complete(c, currentTick);
+		subscribeEvent(TimeRequestEvent.class, c -> complete(c, currentTick));
+		subscribeBroadcast(FinishInitializeBroadcast.class, c -> {
+			countInitialize++;
+			if (countInitialize==numOfServices) {
+				TimerStart();
 			}
 		});
-		subscribeBroadcast(FinishInitializeBroadcast.class, new Callback<FinishInitializeBroadcast>() {
-            @Override
-            public void call(FinishInitializeBroadcast c) {
-                countInitialize++;
-                if (countInitialize==numOfServices) {
-                    TimerStart();
-                }
-            }
-        });
-		subscribeBroadcast(TerminateBroadcast.class, new Callback<TerminateBroadcast>() {
-			@Override
-			public void call(TerminateBroadcast c) {
-				terminate();
-			}
-		});
+		subscribeBroadcast(TerminateBroadcast.class, c -> terminate());
 
 		//notifyAll needs to be in a sync method, notify to the main that time service finish
 		// initialization so all of the services can begin running
@@ -80,7 +67,7 @@ public class TimeService extends MicroService{
 		@Override
 		public void run() {
 			currentTick++;
-			if (currentTick < duration) { //TODO CHECK EQUAL
+			if (currentTick < duration) {
 				sendBroadcast(new TickBroadcast(currentTick));
 			}
 			else {

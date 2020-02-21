@@ -46,8 +46,8 @@ public class Inventory {
 	//@pre
 	//@post
 	public void load (BookInventoryInfo[ ] inventory ) {
-		for (int i = 0; i < inventory.length; i++) {
-			books.put(inventory[i].getBookTitle(), inventory[i]);
+		for (BookInventoryInfo bookInventoryInfo : inventory) {
+			books.put(bookInventoryInfo.getBookTitle(), bookInventoryInfo);
 		}
 	}
 	
@@ -75,7 +75,7 @@ public class Inventory {
      * @param book 		Name of the book.
      * @return the price of the book if it is available, -1 otherwise.
      */
-	public int checkAvailabiltyAndGetPrice(String book) {
+	public int checkAvailabilityAndGetPrice(String book) {
 		if (books.get(book).getAmountInInventory() > 0) {
 			return books.get(book).getPrice();
 		}

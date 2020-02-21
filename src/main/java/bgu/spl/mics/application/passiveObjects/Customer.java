@@ -90,7 +90,7 @@ public class Customer implements Serializable {
 
 	public void chargeCreditCard(int amount) {
 		synchronized (availableAmountInCreditCard) {
-			availableAmountInCreditCard.addAndGet(-1*amount); //todo check
+			availableAmountInCreditCard.addAndGet(-1*amount);
 		}
 	}
 

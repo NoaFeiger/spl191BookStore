@@ -3,27 +3,19 @@ package bgu.spl.mics.application.passiveObjects;
 import java.io.Serializable;
 
 public class OrderSchedule implements Serializable {
-   private String book_name;
+   private String bookName;
    private Integer tick;
 
-   public OrderSchedule(String book_name,Integer tick){
-        this.book_name=book_name;
+   public OrderSchedule(String bookName, Integer tick){
+        this.bookName = bookName;
         this.tick=tick;
    }
 
-    public String getBook_name() {
-        return book_name;
-    }
-
-    public void setBook_name(String book_name) {
-        this.book_name = book_name;
+    public String getBookName() {
+        return bookName;
     }
 
     public Integer getTick() {
         return tick;
-    }
-
-    public void setTick(Integer tick) {
-        this.tick = tick;
     }
 }

@@ -95,7 +95,7 @@ public class BookStoreRunner {
         countServices = countServices + customers_array.size();
         for (int i = 0; i < customers_array.size(); i++) {
             JsonObject customer = customers_array.get(i).getAsJsonObject();
-            int id=customer.get("id").getAsInt(); //TODO CHECK INT
+            int id=customer.get("id").getAsInt();
             String name1 = customer.get("name").getAsString();
             String address = customer.get("address").getAsString();
             Integer distance = customer.get("distance").getAsInt();
@@ -151,10 +151,6 @@ public class BookStoreRunner {
         Inventory.getInstance().printInventoryToFile(args[2]);
         MoneyRegister.getInstance().printOrderReceipts(args[3]);
         printObject(MoneyRegister.getInstance(), args[4]);
-//        DeserializeHashMap(args[1]);
-//        DeserializeHashMap(args[2]);
-//        DeserializeOrderReceipts(args[3]);
-//        DeserializeMoneyRegister(args[4]);
     }
 
     private static void printObject(Object object, String filename) {
@@ -172,6 +168,8 @@ public class BookStoreRunner {
             ioe.printStackTrace();
         }
     }
+
+    // for testing
     private static void DeserializeHashMap(String filename) {
         HashMap map;
         try
@@ -238,11 +236,9 @@ public class BookStoreRunner {
             list = (List) ois.readObject();
             ois.close();
         }
-        catch(IOException ioe)
+        catch(IOException | ClassNotFoundException ioe)
         {
             ioe.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
         }
 
         Iterator iterator = list.iterator();

@@ -67,7 +67,7 @@ public class MessageBusImpl implements MessageBus {
 		}
 		for ( MicroService m : broadcastQueueHashMap.get(b.getClass())){
 			// the queue of the service is synced across the program
-			synchronized(serviceQueueHashMap.get(m)) {  // TODO CHECK IF SYNCHRONIZED IS NEEDED
+			synchronized(serviceQueueHashMap.get(m)) {
 				serviceQueueHashMap.get(m).add(b);
 			}
 		}
@@ -85,7 +85,7 @@ public class MessageBusImpl implements MessageBus {
 		}
 		MicroService m;
 		// needed to make sure the queue is removed and then added in the end
-		synchronized (robin) //todo check
+		synchronized (robin)
 		{
 			if (robin.isEmpty()) {
 				complete(e, null);
@@ -140,8 +140,7 @@ public class MessageBusImpl implements MessageBus {
 	@Override
 	public Message awaitMessage(MicroService m) throws InterruptedException {
 		BlockingQueue<Message> q= serviceQueueHashMap.get(m);
-		Message msg = q.take();
-		return msg;
+		return q.take();
 	}
 
 	

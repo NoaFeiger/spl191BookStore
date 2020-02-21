@@ -47,7 +47,7 @@ public class Future<T> {
      */
 
 	//sync- notifyAll needs to be in a sync method
-	public synchronized void resolve (T result) { //todo check
+	public synchronized void resolve (T result) {
 		this.result=result;
 		this.done=true;
 		notifyAll();
@@ -73,7 +73,7 @@ public class Future<T> {
      */
 
 	//sync- wait needs to be in a sync method
-	public synchronized T get(long timeout, TimeUnit unit) { //todo check
+	public synchronized T get(long timeout, TimeUnit unit) {
 		long timeoutExpiredMs = System.currentTimeMillis() + TimeUnit.MILLISECONDS.convert(timeout, unit);
 		while (!isDone()) {
 			long waitMs = timeoutExpiredMs - System.currentTimeMillis();

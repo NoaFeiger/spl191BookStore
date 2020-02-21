@@ -21,32 +21,21 @@ public class InventoryService extends MicroService{
 
 	@Override
 	protected void initialize() {
-		subscribeEvent(CheckAvailabiltyEvent.class, new Callback<CheckAvailabiltyEvent>() {
-			@Override
-			public void call(CheckAvailabiltyEvent c) {
-				int price = inventory.checkAvailabiltyAndGetPrice(c.getBookname());
-				complete(c, price);
-			}
+		subscribeEvent(CheckAvailabilityEvent.class, c -> {
+			int price = inventory.checkAvailabilityAndGetPrice(c.getBookName());
+			complete(c, price);
 		});
-		subscribeEvent(TakeEvent.class, new Callback<TakeEvent>() {
-			@Override
-			public void call(TakeEvent c) {
-				OrderResult or = inventory.take(c.getBookname());
-				if (or==OrderResult.SUCCESSFULLY_TAKEN) {
-					complete(c, true);
-				}
-				else {
-					complete(c, false);
-				}
+		subscribeEvent(TakeEvent.class, c -> {
+			OrderResult or = inventory.take(c.getBookName());
+			if (or==OrderResult.SUCCESSFULLY_TAKEN) {
+				complete(c, true);
+			}
+			else {
+				complete(c, false);
+			}
 
-			}
 		});
-		subscribeBroadcast(TerminateBroadcast.class, new Callback<TerminateBroadcast>() {
-			@Override
-			public void call(TerminateBroadcast c) {
-				terminate();
-			}
-		});
+		subscribeBroadcast(TerminateBroadcast.class, c -> terminate());
 		sendBroadcast( new FinishInitializeBroadcast());
 
 	}
